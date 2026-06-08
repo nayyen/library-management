@@ -71,11 +71,14 @@ async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, 
 @pytest_asyncio.fixture
 async def user_factory(db_session: AsyncSession):
     """Factory fixture: `await user_factory(role="student", email=..., password=...)`
-    inserts a user row and returns it.
+    inserts a real user row (via the now-existing `User` model + `pwdlib`
+    Argon2 hashing) and returns it.
 
     Guarded import: the `User` model + `app.core.security` password hashing
     land in Plan 02. Until then, calling this fixture skips the test with a
-    clear message rather than raising an ImportError at collection time.
+    clear message rather than raising an ImportError at collection time —
+    keeps `test_health_ok` collectible even if this module is imported before
+    Plan 02 lands.
     """
 
     async def _create(
@@ -103,3 +106,23 @@ async def user_factory(db_session: AsyncSession):
         return user
 
     return _create
+
+
+@pytest.fixture
+def access_token_for():
+    """Helper: `access_token_for(user)` mints a real access token (via the
+    finalized `core.security.create_access_token`) so tests can authenticate
+    the `async_client` as a given user without going through `/auth/login`.
+
+    Used by `test_require_role_rejects_wrong_role` (and any future protected-
+    route test) to assert AUTH-04 enforcement directly against a known user
+    + role, independent of the login flow under test elsewhere.
+    """
+
+    def _mint(user: Any) -> str:
+        from app.core.security import create_access_token  # noqa: PLC0415
+
+        role = user.role.value if hasattr(user.role, "value") else user.role
+        return create_access_token(user.id, role)
+
+    return _mint
