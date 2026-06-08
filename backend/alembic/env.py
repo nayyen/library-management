@@ -17,7 +17,7 @@ from app.config import settings
 # Import every model module BEFORE referencing Base.metadata — otherwise
 # target_metadata is empty and `alembic revision --autogenerate` produces a
 # no-op migration (RESEARCH Pitfall 3: "Empty Alembic autogenerate").
-from app.models import base  # noqa: F401
+import app.models  # noqa: F401  (registers User + RefreshToken on Base.metadata)
 from app.models.base import Base
 
 # this is the Alembic Config object, which provides access to values within
