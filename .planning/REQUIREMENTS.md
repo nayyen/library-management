@@ -85,37 +85,37 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | TBD | Pending |
-| AUTH-02 | TBD | Pending |
-| AUTH-03 | TBD | Pending |
-| AUTH-04 | TBD | Pending |
-| CAT-01 | TBD | Pending |
-| CAT-02 | TBD | Pending |
-| CAT-03 | TBD | Pending |
-| CAT-04 | TBD | Pending |
-| CAT-05 | TBD | Pending |
-| BORW-01 | TBD | Pending |
-| BORW-02 | TBD | Pending |
-| BORW-03 | TBD | Pending |
-| BORW-04 | TBD | Pending |
-| BORW-05 | TBD | Pending |
-| BORW-06 | TBD | Pending |
-| LOAN-01 | TBD | Pending |
-| LOAN-02 | TBD | Pending |
-| LOAN-03 | TBD | Pending |
-| LOAN-04 | TBD | Pending |
-| LOAN-05 | TBD | Pending |
-| LOAN-06 | TBD | Pending |
-| LOAN-07 | TBD | Pending |
-| NOTF-01 | TBD | Pending |
-| NOTF-02 | TBD | Pending |
-| NOTF-03 | TBD | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| CAT-01 | Phase 2 | Pending |
+| CAT-02 | Phase 2 | Pending |
+| CAT-03 | Phase 3 | Pending |
+| CAT-04 | Phase 3 | Pending |
+| CAT-05 | Phase 3 | Pending |
+| BORW-01 | Phase 4 | Pending |
+| BORW-02 | Phase 4 | Pending |
+| BORW-03 | Phase 4 | Pending |
+| BORW-04 | Phase 4 | Pending |
+| BORW-05 | Phase 4 | Pending |
+| BORW-06 | Phase 4 | Pending |
+| LOAN-01 | Phase 5 | Pending |
+| LOAN-02 | Phase 5 | Pending |
+| LOAN-03 | Phase 5 | Pending |
+| LOAN-04 | Phase 5 | Pending |
+| LOAN-05 | Phase 5 | Pending |
+| LOAN-06 | Phase 5 | Pending |
+| LOAN-07 | Phase 5 | Pending |
+| NOTF-01 | Phase 6 | Pending |
+| NOTF-02 | Phase 6 | Pending |
+| NOTF-03 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 25 total
-- Mapped to phases: 0 (filled in by roadmap creation)
-- Unmapped: 25 ⚠️ (expected — roadmapper will populate)
+- Mapped to phases: 25
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-08*
-*Last updated: 2026-06-08 after initial definition*
+*Last updated: 2026-06-08 after roadmap creation (25/25 requirements mapped to 6 phases)*
