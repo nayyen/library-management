@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.dependencies.db import get_db
+from app.routers import auth
 
 app = FastAPI(title="Library Management System API")
 
@@ -23,6 +24,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
 
 
 @app.get("/health")
