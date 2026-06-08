@@ -38,7 +38,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans (Walking Skeleton — also produces 01-SKELETON.md)
 
   - [x] 01-01-PLAN.md — Scaffold: Docker Compose stack + FastAPI/Alembic + Vite/Tailwind/shadcn + Wave 0 test infra
-  - [ ] 01-02-PLAN.md — Backend auth slice: models + migration + JWT/refresh rotation + signup/login/refresh + require_role (AUTH-01/02/04)
+  - [x] 01-02-PLAN.md — Backend auth slice: models + migration + JWT/refresh rotation + signup/login/refresh + require_role (AUTH-01/02/04)
   - [ ] 01-03-PLAN.md — Frontend auth slice: Zustand + axios interceptor + silent refresh + login/signup + role-gated dashboard (AUTH-01/02/04)
   - [ ] 01-04-PLAN.md — Password reset slice: reset-token table + Mailpit email + forgot/reset + session-wipe + auto-login (AUTH-03)
 
@@ -128,7 +128,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Auth Foundation | 1/4 | In Progress|  |
+| 1. Auth Foundation | 2/4 | In Progress|  |
 | 2. Catalog Browse | 0/TBD | Not started | - |
 | 3. Catalog Management | 0/TBD | Not started | - |
 | 4. Borrow Request, Approval & Checkout | 0/TBD | Not started | - |
