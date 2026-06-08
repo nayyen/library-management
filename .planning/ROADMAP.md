@@ -31,7 +31,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. A user can log in and remains logged in across a browser refresh
   3. A user who forgets their password can request and use an emailed reset link to regain access
   4. Librarian-only and student-only actions are rejected server-side (403) when attempted by the wrong role, regardless of what the UI shows
-**Plans**: TBD
+**Plans**: 4 plans (Walking Skeleton — also produces 01-SKELETON.md)
+  - [ ] 01-01-PLAN.md — Scaffold: Docker Compose stack + FastAPI/Alembic + Vite/Tailwind/shadcn + Wave 0 test infra
+  - [ ] 01-02-PLAN.md — Backend auth slice: models + migration + JWT/refresh rotation + signup/login/refresh + require_role (AUTH-01/02/04)
+  - [ ] 01-03-PLAN.md — Frontend auth slice: Zustand + axios interceptor + silent refresh + login/signup + role-gated dashboard (AUTH-01/02/04)
+  - [ ] 01-04-PLAN.md — Password reset slice: reset-token table + Mailpit email + forgot/reset + session-wipe + auto-login (AUTH-03)
 
 ### Phase 2: Catalog Browse
 **Goal**: Students can find out whether a book is available before walking to the library, by searching and browsing a real catalog
@@ -104,7 +108,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Auth Foundation | 0/TBD | Not started | - |
+| 1. Auth Foundation | 0/4 | Not started | - |
 | 2. Catalog Browse | 0/TBD | Not started | - |
 | 3. Catalog Management | 0/TBD | Not started | - |
 | 4. Borrow Request, Approval & Checkout | 0/TBD | Not started | - |
