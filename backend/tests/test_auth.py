@@ -1,6 +1,6 @@
 """AUTH backend tests — Plan 02 implements AUTH-01/02/04 (signup, login,
-refresh rotation, role enforcement). AUTH-03 (forgot/reset password) remains
-xfail until Plan 04.
+refresh rotation, role enforcement). AUTH-03 (forgot/reset password) is
+implemented in Plan 04.
 
 Naming -> requirement map (see 01-VALIDATION.md):
   AUTH-01 (signup + role + librarian code):
@@ -11,19 +11,20 @@ Naming -> requirement map (see 01-VALIDATION.md):
     test_login_issues_tokens
     test_refresh_rotates_token
   AUTH-03 (forgot/reset password — enumeration-safe, single-use, revokes sessions):
-    test_forgot_password_enumeration_safe   [xfail — Plan 04]
-    test_reset_password_single_use          [xfail — Plan 04]
-    test_reset_revokes_all_sessions         [xfail — Plan 04]
+    test_forgot_password_enumeration_safe
+    test_reset_password_single_use
+    test_reset_revokes_all_sessions
   AUTH-04 (server-side role enforcement):
     test_require_role_rejects_wrong_role
 """
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
-
-XFAIL_REASON = "implemented in Plan 02/03/04"
 
 
 # ---------------------------------------------------------------------------
@@ -177,23 +178,102 @@ async def test_refresh_rotates_token(async_client: AsyncClient, user_factory) ->
 
 
 # ---------------------------------------------------------------------------
-# AUTH-03: forgot/reset password — implemented in Plan 04
+# AUTH-03: forgot/reset password
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.xfail(reason=XFAIL_REASON, strict=False)
-async def test_forgot_password_enumeration_safe(async_client: AsyncClient, user_factory) -> None:
-    raise NotImplementedError("AUTH-03: implemented in Plan 04")
+async def test_forgot_password_enumeration_safe(
+    async_client: AsyncClient, user_factory, db_session: AsyncSession
+) -> None:
+    """D-09: identical response for a registered vs. unregistered email."""
+    await user_factory(email="reset.enum@example.com")
+
+    with patch("app.services.email_service.send_reset_email", new_callable=AsyncMock):
+        resp_registered = await async_client.post(
+            "/auth/forgot-password", json={"email": "reset.enum@example.com"}
+        )
+        resp_unknown = await async_client.post(
+            "/auth/forgot-password", json={"email": "nobody.here@example.com"}
+        )
+
+    assert resp_registered.status_code == 200
+    assert resp_unknown.status_code == 200
+    # D-09: body must be byte-identical regardless of registration status.
+    assert resp_registered.json() == resp_unknown.json()
+    assert "reset link" in resp_registered.json()["message"].lower()
 
 
-@pytest.mark.xfail(reason=XFAIL_REASON, strict=False)
-async def test_reset_password_single_use(async_client: AsyncClient, user_factory) -> None:
-    raise NotImplementedError("AUTH-03: implemented in Plan 04")
+async def test_reset_password_single_use(
+    async_client: AsyncClient, user_factory, db_session: AsyncSession
+) -> None:
+    """D-08: a reset token is rejected on second use (used_at set on first use)."""
+    user = await user_factory(email="reset.single@example.com", password="original-password-1")
+
+    # Create a reset token directly via the service (bypasses email delivery).
+    from app.services.auth_service import create_reset_token  # noqa: PLC0415
+
+    raw_token = await create_reset_token(db_session, user)
+
+    # First use: succeeds — sets new password, auto-logs-in.
+    first = await async_client.post(
+        "/auth/reset-password",
+        json={"token": raw_token, "new_password": "new-secure-password-1"},
+    )
+    assert first.status_code == 200
+    body = first.json()
+    assert "access_token" in body and body["access_token"]
+    assert "refresh_token" in first.cookies
+
+    # Second use: same token must be rejected (D-08 single-use).
+    second = await async_client.post(
+        "/auth/reset-password",
+        json={"token": raw_token, "new_password": "another-new-password"},
+    )
+    assert second.status_code == 400
+    assert "no longer valid" in second.json()["detail"].lower()
 
 
-@pytest.mark.xfail(reason=XFAIL_REASON, strict=False)
-async def test_reset_revokes_all_sessions(async_client: AsyncClient, user_factory) -> None:
-    raise NotImplementedError("AUTH-03: implemented in Plan 04")
+async def test_reset_revokes_all_sessions(
+    async_client: AsyncClient, user_factory, db_session: AsyncSession
+) -> None:
+    """D-07: resetting password revokes ALL existing refresh tokens; the new
+    access token from the reset response is valid."""
+    user = await user_factory(email="reset.revoke@example.com", password="original-password-2")
+
+    # Login to establish a pre-existing session (simulates "other device").
+    login_resp = await async_client.post(
+        "/auth/login",
+        json={"email": "reset.revoke@example.com", "password": "original-password-2"},
+    )
+    assert login_resp.status_code == 200
+    old_refresh_cookie = login_resp.cookies["refresh_token"]
+
+    # Create a reset token directly via the service.
+    from app.services.auth_service import create_reset_token  # noqa: PLC0415
+
+    raw_token = await create_reset_token(db_session, user)
+
+    # Perform the reset.
+    reset_resp = await async_client.post(
+        "/auth/reset-password",
+        json={"token": raw_token, "new_password": "post-reset-password-2"},
+    )
+    assert reset_resp.status_code == 200
+    new_access_token = reset_resp.json()["access_token"]
+    assert new_access_token  # auto-login issued a valid access token (D-10)
+
+    # D-07: the pre-existing refresh token must now be revoked — attempting to
+    # use it should return 401.
+    async_client.cookies.set("refresh_token", old_refresh_cookie, path="/auth")
+    stale_refresh = await async_client.post("/auth/refresh")
+    assert stale_refresh.status_code == 401
+
+    # The new access token from the reset response must be functional.
+    me_resp = await async_client.get(
+        "/auth/me", headers={"Authorization": f"Bearer {new_access_token}"}
+    )
+    assert me_resp.status_code == 200
+    assert me_resp.json()["email"] == "reset.revoke@example.com"
 
 
 # ---------------------------------------------------------------------------

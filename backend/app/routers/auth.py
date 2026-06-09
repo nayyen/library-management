@@ -9,7 +9,7 @@ Per RESEARCH Pitfall 1 — do NOT set an explicit `domain=` on the cookie
 (causes `localhost` vs `127.0.0.1` mismatches between Vite/CORS/cookies).
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
@@ -22,9 +22,15 @@ from app.core.exceptions import (
 from app.dependencies.auth import get_current_user
 from app.dependencies.db import get_db
 from app.models.user import User
-from app.schemas.auth import LoginRequest, SignupRequest, TokenResponse
+from app.schemas.auth import (
+    ForgotPasswordRequest,
+    LoginRequest,
+    ResetPasswordRequest,
+    SignupRequest,
+    TokenResponse,
+)
 from app.schemas.user import UserRead
-from app.services import auth_service
+from app.services import auth_service, email_service
 
 router = APIRouter()
 
@@ -159,3 +165,73 @@ async def logout(
 @router.get("/me", response_model=UserRead)
 async def me(current_user: User = Depends(get_current_user)) -> UserRead:
     return UserRead.model_validate(current_user)
+
+
+# UI-SPEC Copywriting Contract — forgot-password generic confirmation (D-09).
+# Returned for BOTH registered and unregistered emails — never reveals whether
+# the address is in the system (T-01-03-ENUM).
+FORGOT_PASSWORD_MESSAGE = (
+    "If that email is registered, you'll receive a reset link shortly."
+)
+
+# UI-SPEC: reset link expired or already-used message (D-08).
+RESET_LINK_INVALID_MESSAGE = (
+    "This reset link is no longer valid. "
+    "It may have expired or already been used — request a new one."
+)
+
+
+@router.post("/forgot-password")
+async def forgot_password(
+    payload: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, str]:
+    """Enumeration-safe forgot-password endpoint (D-09).
+
+    Always returns the same generic message regardless of whether the email is
+    registered. If the user exists, a reset token is created and the email is
+    sent via a BackgroundTask (fire-and-forget, never blocks the HTTP response).
+    """
+    from sqlalchemy import select  # noqa: PLC0415 — local to avoid circular at module level
+
+    from app.models.user import User as UserModel  # noqa: PLC0415
+
+    result = await db.execute(select(UserModel).where(UserModel.email == payload.email))
+    user = result.scalar_one_or_none()
+
+    if user is not None:
+        raw_token = await auth_service.create_reset_token(db, user)
+        reset_link = f"{settings.FRONTEND_URL}/reset-password?token={raw_token}"
+        # Fire-and-forget: SMTP round-trip never blocks the HTTP response.
+        background_tasks.add_task(email_service.send_reset_email, payload.email, reset_link)
+
+    # D-09: identical response both branches.
+    return {"message": FORGOT_PASSWORD_MESSAGE}
+
+
+@router.post("/reset-password", response_model=TokenResponse)
+async def reset_password(
+    payload: ResetPasswordRequest,
+    response: Response,
+    db: AsyncSession = Depends(get_db),
+) -> TokenResponse:
+    """Reset password, revoke all sessions (D-07), and auto-login (D-10).
+
+    Validates the reset token (single-use, 1-hour TTL per D-08). On success:
+    sets the new password, marks the token used, revokes every existing refresh
+    token for the user (session fixation defence), and issues a fresh token pair
+    so the user is automatically logged in.
+    """
+    try:
+        access_token, raw_refresh, user = await auth_service.reset_password(
+            db, payload.token, payload.new_password
+        )
+    except RefreshTokenInvalid as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=RESET_LINK_INVALID_MESSAGE,
+        ) from exc
+
+    _set_refresh_cookie(response, raw_refresh)
+    return TokenResponse(access_token=access_token, user=UserRead.model_validate(user))

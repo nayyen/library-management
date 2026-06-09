@@ -25,9 +25,11 @@ from app.core.exceptions import (
 from app.core.security import (
     create_access_token,
     generate_refresh_token,
+    generate_reset_token,
     get_password_hash,
     verify_password,
 )
+from app.models.password_reset_token import PasswordResetToken
 from app.models.refresh_token import RefreshToken
 from app.models.user import User, UserRole
 
@@ -206,3 +208,80 @@ async def revoke_all_user_sessions(db: AsyncSession, user_id: int) -> None:
     result = await db.execute(stmt)
     for token_row in result.scalars():
         token_row.revoked_at = now
+
+
+async def create_reset_token(db: AsyncSession, user: User) -> str:
+    """Invalidate any prior unused reset tokens for the user, then create and
+    persist a new hashed reset token. Returns the RAW token (to be embedded in
+    the email link — never stored).
+
+    Invalidating prior tokens prevents link accumulation: only the most-recently
+    requested link is valid at any given time.
+    """
+    # Invalidate prior unused tokens for this user (mark them used_at = now)
+    # so only one active reset token exists at a time.
+    now = datetime.now(timezone.utc)
+    stmt = select(PasswordResetToken).where(
+        PasswordResetToken.user_id == user.id,
+        PasswordResetToken.used_at.is_(None),
+    )
+    result = await db.execute(stmt)
+    for prior in result.scalars():
+        prior.used_at = now
+
+    raw, hashed = generate_reset_token()
+    expires_at = now + timedelta(minutes=settings.RESET_TOKEN_EXPIRE_MINUTES)
+    db.add(
+        PasswordResetToken(
+            user_id=user.id,
+            token_hash=hashed,
+            expires_at=expires_at,
+        )
+    )
+    await db.commit()
+    return raw
+
+
+async def reset_password(
+    db: AsyncSession,
+    raw_token: str,
+    new_password: str,
+) -> tuple[str, str, User]:
+    """Validate a password-reset token, set the new password, revoke ALL
+    sessions (D-07), and issue a fresh token pair for auto-login (D-10).
+
+    Rejects the token if: not found, already used (`used_at IS NOT NULL`),
+    or past its `expires_at` (D-08). Raises `RefreshTokenInvalid` (reused
+    exception type) so the router maps it to a consistent 400/401 response.
+    """
+    hashed = hashlib.sha256(raw_token.encode()).hexdigest()
+
+    stmt = select(PasswordResetToken).where(PasswordResetToken.token_hash == hashed)
+    result = await db.execute(stmt)
+    token_row = result.scalar_one_or_none()
+
+    if token_row is None or token_row.used_at is not None:
+        raise RefreshTokenInvalid
+
+    now = datetime.now(timezone.utc)
+    if token_row.expires_at.replace(tzinfo=timezone.utc) < now:
+        raise RefreshTokenInvalid
+
+    user = await db.get(User, token_row.user_id)
+    if user is None:
+        raise RefreshTokenInvalid
+
+    # Set new password hash.
+    user.hashed_password = get_password_hash(new_password)
+    # Mark token consumed (single-use, D-08).
+    token_row.used_at = now
+
+    # Revoke ALL existing sessions — session fixation defence (D-07).
+    await revoke_all_user_sessions(db, user.id)
+
+    # Issue a fresh token pair (auto-login, D-10).
+    access_token, raw_refresh = await issue_token_pair(db, user)
+    await db.commit()
+    await db.refresh(user)
+
+    return access_token, raw_refresh, user
