@@ -26,14 +26,14 @@ logger = logging.getLogger(__name__)
 _TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates" / "email"
 
 _conf = ConnectionConfig(
-    MAIL_USERNAME=settings.MAIL_USERNAME,
-    MAIL_PASSWORD=settings.MAIL_PASSWORD,
+    MAIL_USERNAME="",            # Mailpit needs no SMTP auth — explicit empty
+    MAIL_PASSWORD="",            # Mailpit needs no SMTP auth — explicit empty
     MAIL_FROM=settings.MAIL_FROM,
     MAIL_PORT=settings.MAIL_PORT,
     MAIL_SERVER=settings.MAIL_SERVER,
     MAIL_STARTTLS=settings.MAIL_STARTTLS,
     MAIL_SSL_TLS=settings.MAIL_SSL_TLS,
-    USE_CREDENTIALS=bool(settings.MAIL_USERNAME),
+    USE_CREDENTIALS=False,       # Mailpit never uses SMTP AUTH
     VALIDATE_CERTS=False,
     TEMPLATE_FOLDER=_TEMPLATE_DIR,
 )
