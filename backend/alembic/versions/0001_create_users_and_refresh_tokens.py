@@ -19,6 +19,7 @@ from collections.abc import Sequence
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision: str = "0001"
@@ -26,11 +27,14 @@ down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
-user_role_enum = sa.Enum("student", "librarian", name="user_role")
-
 
 def upgrade() -> None:
-    user_role_enum.create(op.get_bind(), checkfirst=True)
+    op.execute(sa.text(
+        "DO $$ BEGIN "
+        "  CREATE TYPE user_role AS ENUM ('student', 'librarian'); "
+        "EXCEPTION WHEN duplicate_object THEN NULL; "
+        "END $$"
+    ))
 
     op.create_table("users",
         sa.Column("id", sa.Integer(), primary_key=True),
@@ -38,7 +42,7 @@ def upgrade() -> None:
         sa.Column("hashed_password", sa.String(length=255), nullable=False),
         sa.Column(
             "role",
-            sa.Enum("student", "librarian", name="user_role", create_type=False),
+            postgresql.ENUM("student", "librarian", name="user_role", create_type=False),
             nullable=False,
         ),
         sa.Column(
@@ -84,4 +88,4 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_users_email"), table_name="users")
     op.drop_table("users")
 
-    user_role_enum.drop(op.get_bind(), checkfirst=True)
+    op.execute(sa.text("DROP TYPE IF EXISTS user_role"))
