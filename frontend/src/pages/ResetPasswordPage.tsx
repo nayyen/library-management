@@ -1,9 +1,12 @@
 import { useState } from "react";
 
+import { useQuery } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+
+import { apiClient } from "@/api/client";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -59,10 +62,31 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
   const resetPassword = useResetPassword();
   const [showPassword, setShowPassword] = useState(false);
-  const [tokenInvalid, setTokenInvalid] = useState(false);
+  // Tracks token invalidity detected after form submission (race: was valid on
+  // load but used/expired by the time the user submitted).
+  const [submissionTokenInvalid, setSubmissionTokenInvalid] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const token = searchParams.get("token");
+
+  // Validate the token on page load (read-only preflight — does NOT consume it).
+  // This surfaces the "no longer valid" copy immediately when clicking a used or
+  // expired link, instead of only after form submission (D-08).
+  const {
+    isFetching: isValidating,
+    isError: loadTokenInvalid,
+  } = useQuery({
+    queryKey: ["reset-token-validate", token],
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ valid: boolean }>(
+        `/auth/validate-reset-token?token=${encodeURIComponent(token!)}`,
+      );
+      return data;
+    },
+    enabled: !!token,
+    retry: false,
+    staleTime: Infinity,
+  });
 
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
@@ -71,9 +95,29 @@ export default function ResetPasswordPage() {
     defaultValues: { new_password: "" },
   });
 
-  // No token in URL — show the terminal invalid-link view immediately.
-  if (!token || tokenInvalid) {
+  // Terminal states: no token in URL, token invalid on load, or token
+  // invalidated between load and submission (edge case: concurrent use).
+  if (!token || loadTokenInvalid || submissionTokenInvalid) {
     return <InvalidTokenView />;
+  }
+
+  // Brief loading state while the preflight check runs (~1 round trip).
+  if (isValidating) {
+    return (
+      <main className="flex min-h-svh items-center justify-center bg-background px-4 py-16">
+        <Card className="w-full max-w-md">
+          <CardHeader className="gap-1">
+            <h1 className="text-display text-foreground">Reset your password</h1>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" />
+              <span className="text-label">Verifying reset link…</span>
+            </div>
+          </CardContent>
+        </Card>
+      </main>
+    );
   }
 
   const onSubmit = (values: ResetPasswordFormValues) => {
@@ -85,9 +129,7 @@ export default function ResetPasswordPage() {
         onError: (err: unknown) => {
           const status = (err as { response?: { status?: number } })?.response?.status;
           if (status === 400) {
-            // Token is used or expired — replace the form with the terminal
-            // invalid-link view so the user gets a clear, unambiguous signal.
-            setTokenInvalid(true);
+            setSubmissionTokenInvalid(true);
           } else {
             setServerError(GENERIC_SERVER_ERROR);
           }

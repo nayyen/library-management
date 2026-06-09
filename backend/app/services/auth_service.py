@@ -210,6 +210,22 @@ async def revoke_all_user_sessions(db: AsyncSession, user_id: int) -> None:
         token_row.revoked_at = now
 
 
+async def is_reset_token_valid(db: AsyncSession, raw_token: str) -> bool:
+    """Read-only preflight: return True iff the token exists, is unused, and has not expired.
+    Does NOT consume the token — safe to call on page load."""
+    hashed = hashlib.sha256(raw_token.encode()).hexdigest()
+    result = await db.execute(
+        select(PasswordResetToken).where(PasswordResetToken.token_hash == hashed)
+    )
+    token_row = result.scalar_one_or_none()
+    if token_row is None or token_row.used_at is not None:
+        return False
+    now = datetime.now(timezone.utc)
+    if token_row.expires_at.replace(tzinfo=timezone.utc) < now:
+        return False
+    return True
+
+
 async def create_reset_token(db: AsyncSession, user: User) -> str:
     """Invalidate any prior unused reset tokens for the user, then create and
     persist a new hashed reset token. Returns the RAW token (to be embedded in

@@ -277,6 +277,47 @@ async def test_reset_revokes_all_sessions(
 
 
 # ---------------------------------------------------------------------------
+# AUTH-03 (cont.): validate-reset-token preflight endpoint
+# ---------------------------------------------------------------------------
+
+
+async def test_validate_reset_token_valid(
+    async_client: AsyncClient, user_factory, db_session: AsyncSession
+) -> None:
+    """GET /auth/validate-reset-token returns 200 for a fresh, unused token."""
+    user = await user_factory(email="validate.valid@example.com")
+    from app.services.auth_service import create_reset_token  # noqa: PLC0415
+
+    raw_token = await create_reset_token(db_session, user)
+
+    response = await async_client.get(f"/auth/validate-reset-token?token={raw_token}")
+    assert response.status_code == 200
+    assert response.json()["valid"] is True
+
+
+async def test_validate_reset_token_used(
+    async_client: AsyncClient, user_factory, db_session: AsyncSession
+) -> None:
+    """GET /auth/validate-reset-token returns 400 for a token that has been used."""
+    user = await user_factory(email="validate.used@example.com", password="original-pw-3")
+    from app.services.auth_service import create_reset_token  # noqa: PLC0415
+
+    raw_token = await create_reset_token(db_session, user)
+
+    # Consume the token via the reset endpoint.
+    used = await async_client.post(
+        "/auth/reset-password",
+        json={"token": raw_token, "new_password": "post-reset-pw-3"},
+    )
+    assert used.status_code == 200
+
+    # Preflight for the same token must now return 400.
+    response = await async_client.get(f"/auth/validate-reset-token?token={raw_token}")
+    assert response.status_code == 400
+    assert "no longer valid" in response.json()["detail"].lower()
+
+
+# ---------------------------------------------------------------------------
 # AUTH-04: server-side role enforcement
 # ---------------------------------------------------------------------------
 

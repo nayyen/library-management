@@ -181,6 +181,25 @@ RESET_LINK_INVALID_MESSAGE = (
 )
 
 
+@router.get("/validate-reset-token")
+async def validate_reset_token(
+    token: str,
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, bool]:
+    """Read-only preflight check: returns 200 if the token is valid, 400 if not.
+
+    Does NOT consume the token. Called by the frontend on page load so the
+    "no longer valid" copy is shown immediately for used/expired links (D-08).
+    """
+    is_valid = await auth_service.is_reset_token_valid(db, token)
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=RESET_LINK_INVALID_MESSAGE,
+        )
+    return {"valid": True}
+
+
 @router.post("/forgot-password")
 async def forgot_password(
     payload: ForgotPasswordRequest,
