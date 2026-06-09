@@ -1,9 +1,9 @@
 ---
-status: testing
+status: resolved
 phase: 01-auth-foundation
 source: [01-VERIFICATION.md]
 started: 2026-06-09T15:00:00Z
-updated: 2026-06-09T15:00:00Z
+updated: 2026-06-09T15:10:00Z
 ---
 
 ## Current Test
@@ -13,7 +13,7 @@ name: Full backend test suite green
 expected: |
   `docker compose exec backend uv run pytest -q` exits 0.
   All 12 AUTH tests + 1 health test pass, 0 failures.
-awaiting: user response
+awaiting: resolved
 
 ---
 
