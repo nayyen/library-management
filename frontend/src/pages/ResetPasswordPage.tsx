@@ -30,12 +30,37 @@ const GENERIC_SERVER_ERROR = "Something went wrong on our end. Please try again 
 const SESSION_REVOCATION_NOTICE =
   "Resetting your password will sign you out of all devices, including this one once you're redirected — for your security.";
 
+// Reusable terminal "link is dead" view — rendered for both missing and
+// rejected (used/expired) tokens so both paths look identical to the user.
+function InvalidTokenView() {
+  return (
+    <main className="flex min-h-svh items-center justify-center bg-background px-4 py-16">
+      <Card className="w-full max-w-md">
+        <CardHeader className="gap-1">
+          <h1 className="text-display text-foreground">Reset your password</h1>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          <Alert variant="destructive" role="alert">
+            <AlertDescription className="text-body">{TOKEN_INVALID_MESSAGE}</AlertDescription>
+          </Alert>
+          <p className="text-label text-muted-foreground">
+            <Link to="/forgot-password" className="text-blue-600 underline underline-offset-4">
+              Request a new reset link
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
+    </main>
+  );
+}
+
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const resetPassword = useResetPassword();
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [tokenInvalid, setTokenInvalid] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const token = searchParams.get("token");
 
@@ -46,38 +71,26 @@ export default function ResetPasswordPage() {
     defaultValues: { new_password: "" },
   });
 
-  // If no token in URL, show invalid link state immediately.
-  if (!token) {
-    return (
-      <main className="flex min-h-svh items-center justify-center bg-background px-4 py-16">
-        <Card className="w-full max-w-md">
-          <CardHeader className="gap-1">
-            <h1 className="text-display text-foreground">Reset your password</h1>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-6">
-            <Alert variant="destructive" role="alert">
-              <AlertDescription className="text-body">{TOKEN_INVALID_MESSAGE}</AlertDescription>
-            </Alert>
-            <p className="text-label text-muted-foreground">
-              <Link to="/forgot-password" className="text-blue-600 underline underline-offset-4">
-                Request a new reset link
-              </Link>
-            </p>
-          </CardContent>
-        </Card>
-      </main>
-    );
+  // No token in URL — show the terminal invalid-link view immediately.
+  if (!token || tokenInvalid) {
+    return <InvalidTokenView />;
   }
 
   const onSubmit = (values: ResetPasswordFormValues) => {
-    setErrorMessage(null);
+    setServerError(null);
     resetPassword.mutate(
       { token, new_password: values.new_password },
       {
         onSuccess: () => navigate("/", { replace: true }),
         onError: (err: unknown) => {
           const status = (err as { response?: { status?: number } })?.response?.status;
-          setErrorMessage(status === 400 ? TOKEN_INVALID_MESSAGE : GENERIC_SERVER_ERROR);
+          if (status === 400) {
+            // Token is used or expired — replace the form with the terminal
+            // invalid-link view so the user gets a clear, unambiguous signal.
+            setTokenInvalid(true);
+          } else {
+            setServerError(GENERIC_SERVER_ERROR);
+          }
         },
       },
     );
@@ -100,9 +113,9 @@ export default function ResetPasswordPage() {
             </AlertDescription>
           </Alert>
 
-          {errorMessage ? (
+          {serverError ? (
             <Alert variant="destructive" role="alert">
-              <AlertDescription className="text-body">{errorMessage}</AlertDescription>
+              <AlertDescription className="text-body">{serverError}</AlertDescription>
             </Alert>
           ) : null}
 
