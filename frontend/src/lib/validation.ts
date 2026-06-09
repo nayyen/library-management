@@ -34,3 +34,21 @@ export const signupSchema = z
   );
 
 export type SignupFormValues = z.infer<typeof signupSchema>;
+
+/**
+ * forgotPasswordSchema — email only.
+ */
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Enter a valid email address."),
+});
+
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+
+/**
+ * resetPasswordSchema — new password with minimum length requirement.
+ */
+export const resetPasswordSchema = z.object({
+  new_password: z.string().min(8, "Password must be at least 8 characters."),
+});
+
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;

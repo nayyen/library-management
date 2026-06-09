@@ -31,12 +31,18 @@ export function useSilentRefresh() {
   useEffect(() => {
     if (inflightRefresh === null) {
       // First invocation (or first after a page reload): fire the request.
+      // `finally` resets the singleton so the next page load (or test) can
+      // fire a fresh refresh. The reset happens AFTER the async work is done,
+      // so a StrictMode re-mount that runs before the request settles still
+      // sees inflightRefresh !== null and correctly skips the duplicate request.
       inflightRefresh = (async () => {
         try {
           const { data } = await apiClient.post<TokenResponse>("/auth/refresh");
           setAuth(data.access_token, data.user);
         } catch {
           clearAuth();
+        } finally {
+          inflightRefresh = null;
         }
       })();
     }

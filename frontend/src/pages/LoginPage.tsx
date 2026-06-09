@@ -115,12 +115,19 @@ export default function LoginPage() {
             </form>
           </Form>
 
-          <p className="text-label text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Link to="/signup" className="text-accent-foreground underline underline-offset-4 text-blue-600">
-              Sign up
-            </Link>
-          </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-label text-muted-foreground">
+              Don&apos;t have an account?{" "}
+              <Link to="/signup" className="text-blue-600 underline underline-offset-4">
+                Sign up
+              </Link>
+            </p>
+            <p className="text-label text-muted-foreground">
+              <Link to="/forgot-password" className="text-blue-600 underline underline-offset-4">
+                Forgot password?
+              </Link>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </main>
