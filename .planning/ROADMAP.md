@@ -13,7 +13,7 @@ This roadmap delivers the library management system as six end-to-end vertical s
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Auth Foundation** - Students and librarians can register, log in, reset passwords, and the system enforces role-separated access server-side
+- [x] **Phase 1: Auth Foundation** - Students and librarians can register, log in, reset passwords, and the system enforces role-separated access server-side (completed 2026-06-09)
 - [ ] **Phase 2: Catalog Browse** - Students can search, filter, and view book/copy availability in the catalog
 - [ ] **Phase 3: Catalog Management** - Librarians can add, edit, and remove books and individual physical copies
 - [ ] **Phase 4: Borrow Request, Approval & Checkout** - Students can request books and librarians can approve/reject and check them out, with limits and concurrency safety enforced
@@ -39,8 +39,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 
   - [x] 01-01-PLAN.md — Scaffold: Docker Compose stack + FastAPI/Alembic + Vite/Tailwind/shadcn + Wave 0 test infra
   - [x] 01-02-PLAN.md — Backend auth slice: models + migration + JWT/refresh rotation + signup/login/refresh + require_role (AUTH-01/02/04)
-  - [ ] 01-03-PLAN.md — Frontend auth slice: Zustand + axios interceptor + silent refresh + login/signup + role-gated dashboard (AUTH-01/02/04)
-  - [ ] 01-04-PLAN.md — Password reset slice: reset-token table + Mailpit email + forgot/reset + session-wipe + auto-login (AUTH-03)
+  - [x] 01-03-PLAN.md — Frontend auth slice: Zustand + axios interceptor + silent refresh + login/signup + role-gated dashboard (AUTH-01/02/04)
+  - [x] 01-04-PLAN.md — Password reset slice: reset-token table + Mailpit email + forgot/reset + session-wipe + auto-login (AUTH-03)
 
 ### Phase 2: Catalog Browse
 
@@ -128,7 +128,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Auth Foundation | 2/4 | In Progress|  |
+| 1. Auth Foundation | 4/4 | Complete   | 2026-06-09 |
 | 2. Catalog Browse | 0/TBD | Not started | - |
 | 3. Catalog Management | 0/TBD | Not started | - |
 | 4. Borrow Request, Approval & Checkout | 0/TBD | Not started | - |
