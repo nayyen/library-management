@@ -14,6 +14,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 
 if TYPE_CHECKING:
+    from app.models.password_reset_token import PasswordResetToken
     from app.models.refresh_token import RefreshToken
 
 
@@ -42,3 +43,6 @@ class User(Base):
     # each other directly — avoids a circular import. Both classes are
     # registered together by `app/models/__init__.py` before any query runs.
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(back_populates="user")
+    password_reset_tokens: Mapped[list["PasswordResetToken"]] = relationship(
+        back_populates="user"
+    )

@@ -81,3 +81,15 @@ def generate_refresh_token() -> tuple[str, str]:
     raw = secrets.token_urlsafe(48)
     hashed = hashlib.sha256(raw.encode()).hexdigest()
     return raw, hashed
+
+
+def generate_reset_token() -> tuple[str, str]:
+    """Returns `(raw_token_for_email_link, sha256_hex_for_db_storage)`.
+
+    Same generation pattern as `generate_refresh_token` — high-entropy random
+    opaque string hashed at rest. The raw value is embedded in the reset URL
+    sent via email; only the hash is persisted (D-08: token hashed at rest).
+    """
+    raw = secrets.token_urlsafe(48)
+    hashed = hashlib.sha256(raw.encode()).hexdigest()
+    return raw, hashed
