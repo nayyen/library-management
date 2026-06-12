@@ -742,22 +742,22 @@ JWT_EXPIRE_MINUTES=60
 
 **If this table is empty:** N/A — see entries above. All package version numbers and the pwdlib recommendation specifically need human confirmation before being treated as locked.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **PG ENUM type naming casing: `PERAN_PENGGUNA` vs `peran_pengguna`**
    - What we know: PostgreSQL folds unquoted identifiers to lowercase; the PRD's ENUM names are written in `SCREAMING_SNAKE_CASE` but this is very likely just documentation style, not a literal casing requirement.
    - What's unclear: Whether any grading rubric or PRD verification step checks the literal type name casing via `\dT` or `information_schema.types`.
-   - Recommendation: Default to lowercase (`peran_pengguna`, `kondisi_buku`, `status_salinan`, `status_peminjaman`) as idiomatic Postgres — this is virtually certain to be correct, but the planner/discuss-phase could surface this to the user for a 30-second confirmation if there's any doubt.
+   - RESOLVED: Use lowercase `snake_case` PG ENUM type names (`peran_pengguna`, `kondisi_buku`, `status_salinan`, `status_peminjaman`) — idiomatic Postgres, adopted by the Phase 1 plans (01-01-PLAN.md).
 
 2. **Sync vs Async SQLAlchemy for the rest of the project**
    - What we know: Phase 1 only needs simple `pengguna` reads/writes (register, login). Sync `psycopg[binary]` + sync SQLAlchemy Session is simplest and meets NFR-01 trivially.
    - What's unclear: Whether Phases 2-5's catalog search / loan workflows will have any concurrency characteristics that benefit from async (unlikely for a course project's expected load, but worth a sanity check before Phase 2 planning).
-   - Recommendation: Proceed with sync for Phase 1 (establishes the pattern); revisit only if Phase 2+ research finds a concrete need.
+   - RESOLVED: Sync SQLAlchemy + `psycopg[binary]` for Phase 1, adopted by 01-01/01-02-PLAN.md; revisit only if Phase 2+ research finds a concrete need for async.
 
 3. **`react-router` (v7 unified) vs `react-router-dom` import naming**
    - What we know: Both packages currently resolve to 7.17.0 on npm; `react-router` is the forward-recommended import.
    - What's unclear: Whether any of the existing mockup/reference code (none currently, since `frontend/` is empty) assumes `react-router-dom` imports — not applicable since this is greenfield.
-   - Recommendation: Use `react-router` imports throughout for new code; no compatibility concern since there's no existing code to migrate.
+   - RESOLVED: Use `react-router` (unified v7 package) imports throughout, adopted by 01-03-PLAN.md.
 
 ## Environment Availability
 
