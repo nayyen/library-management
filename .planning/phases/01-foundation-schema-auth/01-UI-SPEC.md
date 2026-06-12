@@ -21,7 +21,7 @@ created: 2026-06-12
 | Preset | not applicable — shadcn deferred to a later phase that needs richer components (data tables, dialogs) |
 | Component library | none — hand-built components only (login/register card, input field, button, header/sidebar nav, role badge, placeholder page) |
 | Icon library | Material Symbols Outlined (Google Fonts, variable weight 100-700, FILL axis) — loaded exactly as in the mockups via `<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">` |
-| Font | Playfair Display (headings, weights 600/700) + Inter (body/UI, weights 400/500/600) — loaded via `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap">` |
+| Font | Playfair Display (headings, weights 600/700) + Inter (body/UI, weights 400/600) — loaded via `<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600;700&display=swap">` |
 
 **Source of truth for tokens:** `docs/design/stitch_botanical_scholar_library/biblio_design_system/DESIGN.md` (frontmatter `colors`, `typography`, `rounded`, `spacing`). All Tailwind config values below are copied verbatim from this file and the two reference mockups (`login_biblio/code.html`, `dashboard_pustakawan_biblio/code.html`), which use identical token sets.
 
@@ -103,7 +103,7 @@ theme: {
       'headline-sm': ['20px', { lineHeight: '28px', fontWeight: '600' }],
       'body-md': ['16px', { lineHeight: '24px', fontWeight: '400' }],
       'label-md': ['14px', { lineHeight: '16px', letterSpacing: '0.05em', fontWeight: '600' }],
-      'label-sm': ['12px', { lineHeight: '16px', fontWeight: '500' }],
+      'label-sm': ['12px', { lineHeight: '16px', fontWeight: '400' }],
     },
   },
 }
@@ -143,9 +143,9 @@ Exceptions:
 | headline-md | 24px | 600 (semibold) | 32px (1.33) | Playfair Display | Card titles ("Masuk ke Akun Anda", "Buat Akun Baru"), welcome heading ("Selamat datang, {nama}"), "Segera Hadir" placeholder heading |
 | body-md | 16px | 400 (regular) | 24px (1.5) | Inter | Body copy, input text, placeholder body copy, error/helper messages |
 | label-md | 14px | 600 (semibold), 0.05em letter-spacing, uppercase where used for nav | 16px (1.14) | Inter | Input labels ("Email Institusi", "Kata Sandi", "Nama"), primary buttons ("Masuk", "Daftar"), nav links (Katalog, Pinjaman, Dashboard, Anggota) |
-| label-sm | 12px | 500 (medium — DESIGN.md-inherited exception) | 16px (1.33) | Inter | Secondary/helper text, role badge text, "Sudah punya akun?" / "Belum memiliki akun?" link rows |
+| label-sm | 12px | 400 (regular) | 16px (1.33) | Inter | Secondary/helper text, role badge text (mahasiswa/pustakawan per D-06), "Sudah punya akun?" / "Belum memiliki akun?" link rows |
 
-**Weight contract:** Primary weights for this phase are **400 (regular)** and **600 (semibold)**. The 500 (medium) weight used by `label-sm` is a DESIGN.md-inherited exception, reserved only for secondary/metadata text (badges, helper captions) — do not use 500 for primary content or interactive elements.
+**Weight contract:** This phase declares exactly **2 font weights**: **400 (regular)** and **600 (semibold)**. 400 is used for body copy, input text, and secondary/helper text (`label-sm`); 600 is used for headings, primary buttons, input labels, and nav links (`label-md`, `headline-md`). Do not introduce any other weight.
 
 **Heading line-height:** 1.2–1.33 range (headline-md = 32px/24px = 1.33) — acceptable per DESIGN.md's headline tokens; do not compress further.
 **Body line-height:** 1.5 (body-md = 24px/16px) — matches the recommended default.
@@ -215,6 +215,7 @@ All UI copy in Bahasa Indonesia, matching the mockups and PRD.
 
 **Authenticated shell (header/nav, D-05):**
 - Top header bar (`bg-background`, `border-b border-outline-variant`, height 64px / `h-16`): left side = Biblio brand (icon `local_library` + "Biblio" wordmark, `headline-md`/`headline-lg` per existing mockup styling, `text-primary`); nav links "Katalog", "Pinjaman", "Dashboard", "Anggota" (`label-md`, `text-on-surface-variant`, hover → `text-antique-gold`); right side = account icon button (`account_circle`, Material Symbols, filled).
+- Accessible labels for icon-only buttons (required, `aria-label`): the `account_circle` account button uses `aria-label="Akun"`; the `menu` hamburger menu toggle (mobile nav) uses `aria-label="Buka menu navigasi"`.
 - Active nav link gets `border-b-2 border-antique-gold` underline + `text-primary` (per dashboard mockup's "Dashboard" link styling) — this is the one "active state" indicator for Phase 1's shell.
 - **Role-based nav visibility:** show all 4 links (Katalog, Pinjaman, Dashboard, Anggota) to `pustakawan`. For `mahasiswa`, "Dashboard" and "Anggota" are pustakawan-only per the PRD's role model — Phase 1 should still render the shell for both roles, but nav link visibility should be role-aware from the start (mahasiswa sees Katalog + Pinjaman; pustakawan sees all four) since the shell is the reusable layout for Phases 2-5. If this role-based filtering is ambiguous at execution time, default to showing all 4 links for both roles in Phase 1 and let Phase 5 (Dashboard/Members) tighten visibility — but prefer filtering now since it's a one-line conditional.
 - On mobile (<768px), nav links collapse — at minimum the header brand and the account icon button must remain visible and tappable (44x44px min touch target per Spacing Scale exceptions). A hamburger/menu icon-button (`menu`, Material Symbols) opening the nav links in a drawer/sheet is acceptable but not mandated by any Phase 1 success criterion — a simple stacked/visible nav under the header on mobile is sufficient if simpler to implement within the timeline.
