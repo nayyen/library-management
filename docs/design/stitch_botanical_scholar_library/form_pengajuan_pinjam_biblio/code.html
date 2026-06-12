@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Biblio - Form Pengajuan Peminjaman</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#474744",
+                        "surface-container": "#efedef",
+                        "background": "#fbf9fb",
+                        "on-surface-variant": "#44474d",
+                        "outline-variant": "#c5c6cd",
+                        "surface-variant": "#e4e2e4",
+                        "antique-gold": "#C5A059",
+                        "on-tertiary-fixed-variant": "#5d4124",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#dbd9db",
+                        "tertiary-container": "#2b1701",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#d6e3ff",
+                        "on-primary": "#ffffff",
+                        "paper-shadow": "#E8E4D9",
+                        "surface-container-highest": "#e4e2e4",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1b1c1a",
+                        "secondary-container": "#e1dfdc",
+                        "surface-tint": "#515f78",
+                        "primary": "#000000",
+                        "on-surface": "#1b1b1d",
+                        "primary-container": "#0d1c32",
+                        "surface": "#fbf9fb",
+                        "secondary-fixed": "#e4e2de",
+                        "inverse-surface": "#303032",
+                        "on-error": "#ffffff",
+                        "on-background": "#1b1b1d",
+                        "tertiary-fixed-dim": "#e7bf99",
+                        "on-tertiary-container": "#9f7d5b",
+                        "surface-container-high": "#eae7ea",
+                        "sage-green": "#8A9A5B",
+                        "surface-bright": "#fbf9fb",
+                        "ink-blue": "#112240",
+                        "inverse-on-surface": "#f2f0f2",
+                        "surface-container-low": "#f5f3f5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#0d1c32",
+                        "on-secondary-container": "#636360",
+                        "outline": "#75777e",
+                        "alert-crimson": "#93272C",
+                        "tertiary": "#000000",
+                        "on-tertiary-fixed": "#2b1701",
+                        "inverse-primary": "#b9c7e4",
+                        "secondary": "#5e5e5c",
+                        "on-primary-container": "#76849f",
+                        "on-primary-fixed-variant": "#39475f",
+                        "primary-fixed-dim": "#b9c7e4",
+                        "secondary-fixed-dim": "#c8c6c3",
+                        "tertiary-fixed": "#ffdcbd",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "base": "8px",
+                        "gutter": "24px",
+                        "container-max": "1200px",
+                        "margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Playfair Display"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen relative flex items-center justify-center p-4">
+<!-- Blur Backdrop Overlay -->
+<div class="fixed inset-0 bg-surface-tint bg-opacity-40 backdrop-blur-sm z-40 transition-opacity duration-300"></div>
+<!-- Modal Container -->
+<div class="relative bg-surface rounded-xl shadow-2xl z-50 w-full max-w-lg overflow-hidden flex flex-col transform transition-all duration-300 scale-100 border border-paper-shadow">
+<!-- Header -->
+<div class="flex justify-between items-center px-6 py-5 border-b border-paper-shadow bg-surface-container-lowest">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary">Formulir Peminjaman</h2>
+<p class="font-body-sm text-body-sm text-secondary mt-1">Sistem Manajemen Perpustakaan</p>
+</div>
+<button aria-label="Tutup Modal" class="text-secondary hover:text-primary transition-colors focus:outline-none rounded-full p-1 hover:bg-surface-container">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Body -->
+<div class="px-6 py-6 space-y-8 overflow-y-auto max-h-[716px]">
+<!-- Book Details Section (The "Book" Component Style) -->
+<section class="flex gap-4 p-4 bg-surface-container-low rounded-lg border border-paper-shadow">
+<!-- Spine Effect Book Cover Placeholder -->
+<div class="w-20 h-28 bg-primary rounded-r flex-shrink-0 flex items-center justify-center border-l-4 border-antique-gold shadow-sm" style="box-shadow: inset 2px 0 4px rgba(0,0,0,0.2);">
+<span class="material-symbols-outlined text-on-primary text-3xl" data-weight="fill">menu_book</span>
+</div>
+<div class="flex flex-col justify-center">
+<span class="font-label-sm text-label-sm text-antique-gold uppercase tracking-wider mb-1">Buku Terpilih</span>
+<h3 class="font-headline-sm text-headline-sm text-primary leading-tight mb-2">Metodologi Penelitian Kualitatif</h3>
+<div class="flex items-center text-secondary font-body-sm text-body-sm mb-1">
+<span class="material-symbols-outlined text-sm mr-1">person</span>
+                        Prof. Dr. Sugiyono
+                    </div>
+<div class="flex items-center text-secondary font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-sm mr-1">barcode</span>
+                        ISBN: 978-602-289-325-7
+                    </div>
+</div>
+</section>
+<!-- Borrower Info Section -->
+<section class="space-y-4">
+<h4 class="font-label-md text-label-md text-primary border-b border-paper-shadow pb-2">Informasi Peminjam</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="space-y-1">
+<label class="font-label-sm text-label-sm text-secondary block">Nama Lengkap</label>
+<div class="flex items-center bg-surface-container-low border border-paper-shadow rounded px-3 py-2">
+<span class="material-symbols-outlined text-secondary mr-2 text-lg">account_circle</span>
+<span class="font-body-md text-body-md text-primary">Budi Santoso</span>
+</div>
+</div>
+<div class="space-y-1">
+<label class="font-label-sm text-label-sm text-secondary block">Peran</label>
+<div class="flex items-center bg-surface-container-low border border-paper-shadow rounded px-3 py-2">
+<span class="material-symbols-outlined text-secondary mr-2 text-lg">school</span>
+<span class="font-body-md text-body-md text-primary capitalize">mahasiswa</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Loan Summary Section -->
+<section class="bg-primary-fixed bg-opacity-30 rounded-lg p-4 border border-primary-fixed-dim">
+<div class="flex items-start">
+<span class="material-symbols-outlined text-ink-blue mr-3 mt-0.5">info</span>
+<div>
+<h4 class="font-label-md text-label-md text-ink-blue mb-1">Ringkasan Peminjaman</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-2">
+                            Peminjaman berlaku selama <strong class="text-primary">14 hari</strong> setelah buku diserahkan. Pastikan mengembalikan buku tepat waktu untuk menghindari denda sebesar Rp 1.000/hari.
+                        </p>
+<div class="flex justify-between items-center bg-surface rounded px-3 py-2 border border-paper-shadow mt-3">
+<span class="font-body-sm text-body-sm text-secondary">Estimasi Tenggat Waktu:</span>
+<span class="font-label-md text-label-md text-primary">14 November 2024</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer / Actions -->
+<div class="px-6 py-5 bg-surface-container-lowest border-t border-paper-shadow flex flex-col-reverse sm:flex-row justify-end gap-3">
+<button class="px-6 py-2 rounded-DEFAULT font-label-md text-label-md border border-outline text-secondary hover:bg-surface-container transition-colors focus:outline-none focus:ring-2 focus:ring-antique-gold focus:ring-offset-2">
+                Batal
+            </button>
+<button class="px-6 py-2 rounded-DEFAULT font-label-md text-label-md bg-antique-gold text-on-primary hover:opacity-90 transition-opacity flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 shadow-sm">
+                Ajukan Peminjaman
+                <span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+</div>
+</body></html>

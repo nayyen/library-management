@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Librarian Dashboard - Biblio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed-variant": "#474744",
+                      "surface-container": "#efedef",
+                      "background": "#fbf9fb",
+                      "on-surface-variant": "#44474d",
+                      "outline-variant": "#c5c6cd",
+                      "surface-variant": "#e4e2e4",
+                      "antique-gold": "#C5A059",
+                      "on-tertiary-fixed-variant": "#5d4124",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#dbd9db",
+                      "tertiary-container": "#2b1701",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed": "#d6e3ff",
+                      "on-primary": "#ffffff",
+                      "paper-shadow": "#E8E4D9",
+                      "surface-container-highest": "#e4e2e4",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed": "#1b1c1a",
+                      "secondary-container": "#e1dfdc",
+                      "surface-tint": "#515f78",
+                      "primary": "#000000",
+                      "on-surface": "#1b1b1d",
+                      "primary-container": "#0d1c32",
+                      "surface": "#fbf9fb",
+                      "secondary-fixed": "#e4e2de",
+                      "inverse-surface": "#303032",
+                      "on-error": "#ffffff",
+                      "on-background": "#1b1b1d",
+                      "tertiary-fixed-dim": "#e7bf99",
+                      "on-tertiary-container": "#9f7d5b",
+                      "surface-container-high": "#eae7ea",
+                      "sage-green": "#8A9A5B",
+                      "surface-bright": "#fbf9fb",
+                      "ink-blue": "#112240",
+                      "inverse-on-surface": "#f2f0f2",
+                      "surface-container-low": "#f5f3f5",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#0d1c32",
+                      "on-secondary-container": "#636360",
+                      "outline": "#75777e",
+                      "alert-crimson": "#93272C",
+                      "tertiary": "#000000",
+                      "on-tertiary-fixed": "#2b1701",
+                      "inverse-primary": "#b9c7e4",
+                      "secondary": "#5e5e5c",
+                      "on-primary-container": "#76849f",
+                      "on-primary-fixed-variant": "#39475f",
+                      "primary-fixed-dim": "#b9c7e4",
+                      "secondary-fixed-dim": "#c8c6c3",
+                      "tertiary-fixed": "#ffdcbd",
+                      "error-container": "#ffdad6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-mobile": "20px",
+                      "base": "8px",
+                      "gutter": "24px",
+                      "container-max": "1200px",
+                      "margin-desktop": "40px"
+              },
+              "fontFamily": {
+                      "body-sm": ["Inter"],
+                      "headline-lg": ["Playfair Display"],
+                      "display-lg": ["Playfair Display"],
+                      "label-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Playfair Display"],
+                      "headline-lg-mobile": ["Playfair Display"],
+                      "body-md": ["Inter"],
+                      "headline-sm": ["Playfair Display"],
+                      "label-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .book-spine {
+            box-shadow: inset 4px 0 0 0 rgba(0,0,0,0.1);
+        }
+        .soft-shadow {
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-inverse-surface border-b border-outline-variant dark:border-outline docked full-width top-0 z-50">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-16">
+<div class="flex items-center gap-6">
+<a class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim tracking-tight flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">local_library</span>
+                    Biblio
+                </a>
+<nav class="hidden md:flex items-center gap-6 ml-8">
+<a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-antique-gold transition-colors duration-200 text-label-md font-label-md" href="#">Katalog</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-antique-gold transition-colors duration-200 text-label-md font-label-md" href="#">Pinjaman</a>
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-antique-gold pb-1 text-label-md font-label-md opacity-80 transition-all duration-200" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-antique-gold transition-colors duration-200 text-label-md font-label-md" href="#">Anggota</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm font-body-sm ml-2 w-48" placeholder="Cari buku, anggota..." type="text"/>
+</div>
+<button class="text-primary dark:text-primary-fixed-dim hover:text-antique-gold transition-colors duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<div class="flex flex-1 max-w-container-max mx-auto w-full">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col bg-surface-container-low dark:bg-surface-container-highest border-r border-paper-shadow dark:border-outline fixed left-0 top-16 h-[calc(100vh-64px)] w-64 overflow-y-auto z-40">
+<div class="p-6 border-b border-paper-shadow">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-ink-blue text-on-primary flex items-center justify-center font-bold">
+                        P
+                    </div>
+<div>
+<h2 class="text-label-md font-label-md text-primary dark:text-primary-fixed-dim">Panel Kontrol</h2>
+<p class="text-label-sm font-label-sm text-secondary">Librarian Access</p>
+</div>
+</div>
+<button class="w-full bg-ink-blue text-on-primary rounded py-2 text-label-md font-label-md hover:bg-opacity-90 transition-all">
+                    + Tambah Koleksi
+                </button>
+</div>
+<nav class="flex-1 py-4 flex flex-col gap-1">
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 text-label-sm font-label-sm hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">library_books</span>
+                    Semua Buku
+                </a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 text-label-sm font-label-sm hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+                    Fiksi
+                </a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 text-label-sm font-label-sm hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+                    Non-Fiksi
+                </a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 text-label-sm font-label-sm hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+                    Referensi
+                </a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 text-label-sm font-label-sm hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">group_add</span>
+                    Manajemen Anggota
+                </a>
+<a class="bg-primary-container text-on-primary-container font-semibold rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 text-label-sm font-label-sm scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">assessment</span>
+                    Laporan Harian
+                </a>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 md:ml-64 p-margin-mobile md:p-margin-desktop bg-surface pt-24 md:pt-margin-desktop">
+<div class="mb-8">
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-primary mb-2">Librarian Dashboard</h1>
+<p class="text-body-md font-body-md text-secondary">Ringkasan aktivitas perpustakaan hari ini.</p>
+</div>
+<!-- Bento Grid Stats -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-12">
+<!-- Stat Card 1 -->
+<div class="bg-surface-container-lowest border border-paper-shadow rounded-xl p-6 soft-shadow flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-ink-blue opacity-5 rounded-bl-full"></div>
+<span class="material-symbols-outlined text-ink-blue mb-4 text-3xl">library_books</span>
+<h3 class="text-label-sm font-label-sm text-secondary uppercase tracking-wider mb-1">Total Buku</h3>
+<p class="text-headline-md font-headline-md text-primary">12,450</p>
+<div class="mt-4 flex items-center gap-1 text-sage-green text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+24 bulan ini</span>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-surface-container-lowest border border-paper-shadow rounded-xl p-6 soft-shadow flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-antique-gold opacity-5 rounded-bl-full"></div>
+<span class="material-symbols-outlined text-antique-gold mb-4 text-3xl">local_library</span>
+<h3 class="text-label-sm font-label-sm text-secondary uppercase tracking-wider mb-1">Peminjaman Aktif</h3>
+<p class="text-headline-md font-headline-md text-primary">342</p>
+<div class="mt-4 flex items-center gap-1 text-secondary text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>45 menunggu persetujuan</span>
+</div>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-surface-container-lowest border border-paper-shadow rounded-xl p-6 soft-shadow flex flex-col relative overflow-hidden border-l-4 border-l-alert-crimson">
+<div class="absolute top-0 right-0 w-24 h-24 bg-alert-crimson opacity-5 rounded-bl-full"></div>
+<span class="material-symbols-outlined text-alert-crimson mb-4 text-3xl">warning</span>
+<h3 class="text-label-sm font-label-sm text-secondary uppercase tracking-wider mb-1">Buku Terlambat</h3>
+<p class="text-headline-md font-headline-md text-primary">18</p>
+<div class="mt-4 flex items-center gap-1 text-alert-crimson text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[16px]">mail</span>
+<span>Email peringatan terkirim</span>
+</div>
+</div>
+<!-- Stat Card 4 -->
+<div class="bg-surface-container-lowest border border-paper-shadow rounded-xl p-6 soft-shadow flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-sage-green opacity-5 rounded-bl-full"></div>
+<span class="material-symbols-outlined text-sage-green mb-4 text-3xl">payments</span>
+<h3 class="text-label-sm font-label-sm text-secondary uppercase tracking-wider mb-1">Total Denda (Belum Lunas)</h3>
+<p class="text-headline-md font-headline-md text-primary">Rp 45.000</p>
+<div class="mt-4 flex items-center gap-1 text-secondary text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[16px]">receipt_long</span>
+<span>Dari 8 mahasiswa</span>
+</div>
+</div>
+</div>
+<!-- Approval Section -->
+<section class="bg-surface-container-lowest border border-paper-shadow rounded-xl soft-shadow overflow-hidden mb-12">
+<div class="p-6 border-b border-paper-shadow flex justify-between items-center bg-surface-container-low">
+<div>
+<h2 class="text-headline-sm font-headline-sm text-primary">Daftar Pengajuan Peminjaman</h2>
+<p class="text-body-sm font-body-sm text-secondary mt-1">Menunggu persetujuan pustakawan</p>
+</div>
+<button class="text-ink-blue text-label-md font-label-md hover:underline flex items-center gap-1">
+                        Lihat Semua <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface text-secondary text-label-md font-label-md border-b border-paper-shadow">
+<th class="py-4 px-6 font-semibold">Mahasiswa</th>
+<th class="py-4 px-6 font-semibold">Buku</th>
+<th class="py-4 px-6 font-semibold">Tanggal Pengajuan</th>
+<th class="py-4 px-6 font-semibold">Aksi</th>
+</tr>
+</thead>
+<tbody class="text-body-sm font-body-sm text-on-surface">
+<!-- Row 1 -->
+<tr class="border-b border-paper-shadow hover:bg-primary/5 transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-tint text-on-primary flex items-center justify-center font-bold text-xs">
+                                            AR
+                                        </div>
+<div>
+<p class="font-medium">Andi Rahman</p>
+<p class="text-secondary text-xs">19023847</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-14 bg-surface-dim border border-paper-shadow book-spine flex-shrink-0" data-alt="A vintage book cover featuring an abstract geometric design in muted tones of blue, beige, and soft red. The cover appears slightly worn at the edges, suggesting a classic academic text. The lighting is soft and even, highlighting the texture of the paper cover. The overall mood is scholarly and nostalgic, fitting perfectly within a refined digital library interface." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCbVXyw6cI4iu2kTYcoYBqlOmc58JnO3cEWINivIvfYAezGWuraAk_PRb2wf2tPVzbJt2am8vdnB-Rn-UWK_-7EUQgiA28c4ne7kN2JkXEmcnALy0BFYYPo8nMs-9W2hrnHdZadHE1eydmK8yaiLBKiVfjWLSlKezx9LRrE-BN6KW-YXaU-6WEldG46t5p9qUISS5Il8UjQcuDNciX1VfoA25gtnjzyM_aQDrrFcMKnBYQQ0sGK558jzsbkoE9BUq_yk2gg_mQrPMY'); background-size: cover;"></div>
+<div>
+<p class="font-medium text-primary">Sapiens: A Brief History of Humankind</p>
+<p class="text-secondary text-xs">Yuval Noah Harari</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-secondary">
+                                    Hari ini, 09:30
+                                </td>
+<td class="py-4 px-6">
+<div class="flex gap-2">
+<button class="bg-sage-green text-on-primary px-3 py-1.5 rounded text-label-sm font-label-sm hover:bg-opacity-90 transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">check</span> Setujui
+                                        </button>
+<button class="border border-outline text-secondary px-3 py-1.5 rounded text-label-sm font-label-sm hover:bg-surface-variant transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">close</span> Tolak
+                                        </button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-paper-shadow hover:bg-primary/5 transition-colors bg-surface-container-low">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-antique-gold text-on-primary flex items-center justify-center font-bold text-xs">
+                                            BS
+                                        </div>
+<div>
+<p class="font-medium">Budi Santoso</p>
+<p class="text-secondary text-xs">20193845</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-14 bg-surface-dim border border-paper-shadow book-spine flex-shrink-0" data-alt="A modern minimalist book cover with a striking solid yellow background and bold black typography. The spine edge is visible on the left, simulating a physical book. The lighting is bright and clean, creating a crisp, high-contrast look suitable for a contemporary digital library catalog. The aesthetic is functional, bold, and clean." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCO0pZplGIKTRNXu5TsY0jBpd86qVeFhmYrPBGXoLQqN-CA3KkrCYUWTwwv44CfCz96Q1IyH1Xg602SaFCa08-CzPmuy1nXdjrgxs5FuO5qd31K69u_XnL1Lpat87OFlqBgTmhnz77LnWvHWYUR8HkM68fUcqH4u2dEve2GPrAbO7w3lwhpsHX14aW_6ZwUT9BkFwtexXTi0U1OKP1RF6--bsGqYAtnLJu7r0i24ggv3FJ4HULmEbPpHy2lQ5740bKB4jOjvvaUsZE'); background-size: cover;"></div>
+<div>
+<p class="font-medium text-primary">Clean Code</p>
+<p class="text-secondary text-xs">Robert C. Martin</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-secondary">
+                                    Kemarin, 15:45
+                                </td>
+<td class="py-4 px-6">
+<div class="flex gap-2">
+<button class="bg-sage-green text-on-primary px-3 py-1.5 rounded text-label-sm font-label-sm hover:bg-opacity-90 transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">check</span> Setujui
+                                        </button>
+<button class="border border-outline text-secondary px-3 py-1.5 rounded text-label-sm font-label-sm hover:bg-surface-variant transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">close</span> Tolak
+                                        </button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-container text-on-tertiary flex items-center justify-center font-bold text-xs">
+                                            CD
+                                        </div>
+<div>
+<p class="font-medium">Citra Dewi</p>
+<p class="text-secondary text-xs">21098473</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-14 bg-surface-dim border border-paper-shadow book-spine flex-shrink-0" data-alt="A dark, sophisticated book cover featuring deep navy blues and subtle gold accents, reminiscent of a classic novel. The texture looks like aged linen or leather, emphasizing an academic heritage style. The spine detailing on the left edge adds depth. The overall feel is premium, scholarly, and slightly mysterious, fitting perfectly with the warm minimalism of the UI." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBV3thtZuZ17YBI31taDHzQYL8iOjmGvpwYwMZhNxOnYpZ1hSet8n_9YQdBpS4hP66iZScKK8qUKrk7WJFo9Ja8I3rosNVPAHIwjaLz0HhPUDe4jAnwb0wY5vnS_j2Bhoppfs3Ir9t-WHXfuxueGXp8Os1NC33B2iTuN5oLA1WzcsJ3VmxFqLopmjIHzvfZ0cjMzmLYUxhaBAtCo8Ng9uxF3Cp8wJJZacI3mBKMeqtVD6NOUT4FRPH0TdAiat-k0aNoM5VYk2_mSnw'); background-size: cover;"></div>
+<div>
+<p class="font-medium text-primary">The Pragmatic Programmer</p>
+<p class="text-secondary text-xs">Andrew Hunt</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-secondary">
+                                    Kemarin, 14:20
+                                </td>
+<td class="py-4 px-6">
+<div class="flex gap-2">
+<button class="bg-sage-green text-on-primary px-3 py-1.5 rounded text-label-sm font-label-sm hover:bg-opacity-90 transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">check</span> Setujui
+                                        </button>
+<button class="border border-outline text-secondary px-3 py-1.5 rounded text-label-sm font-label-sm hover:bg-surface-variant transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">close</span> Tolak
+                                        </button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-primary dark:bg-primary-container full-width bottom mt-auto z-50">
+<div class="w-full py-12 px-margin-mobile md:px-margin-desktop mt-auto flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto gap-6 md:gap-0">
+<p class="text-on-primary dark:text-on-primary-container opacity-80 text-body-sm font-body-sm">
+                © 2024 Biblio Library System. All rights reserved.
+            </p>
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="text-on-primary dark:text-on-primary-container opacity-80 text-label-sm font-label-sm hover:text-antique-gold hover:opacity-100 transition-opacity" href="#">Pusat Bantuan</a>
+<a class="text-on-primary dark:text-on-primary-container opacity-80 text-label-sm font-label-sm hover:text-antique-gold hover:opacity-100 transition-opacity" href="#">Kebijakan Privasi</a>
+<a class="text-on-primary dark:text-on-primary-container opacity-80 text-label-sm font-label-sm hover:text-antique-gold hover:opacity-100 transition-opacity" href="#">Syarat &amp; Ketentuan</a>
+<a class="text-on-primary dark:text-on-primary-container opacity-80 text-label-sm font-label-sm hover:text-antique-gold hover:opacity-100 transition-opacity" href="#">Kontak</a>
+</nav>
+</div>
+</footer>
+</body></html>

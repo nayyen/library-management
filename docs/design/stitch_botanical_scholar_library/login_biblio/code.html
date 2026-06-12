@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Masuk - Biblio Library System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed-variant": "#474744",
+                      "surface-container": "#efedef",
+                      "background": "#fbf9fb",
+                      "on-surface-variant": "#44474d",
+                      "outline-variant": "#c5c6cd",
+                      "surface-variant": "#e4e2e4",
+                      "antique-gold": "#C5A059",
+                      "on-tertiary-fixed-variant": "#5d4124",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#dbd9db",
+                      "tertiary-container": "#2b1701",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed": "#d6e3ff",
+                      "on-primary": "#ffffff",
+                      "paper-shadow": "#E8E4D9",
+                      "surface-container-highest": "#e4e2e4",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed": "#1b1c1a",
+                      "secondary-container": "#e1dfdc",
+                      "surface-tint": "#515f78",
+                      "primary": "#000000",
+                      "on-surface": "#1b1b1d",
+                      "primary-container": "#0d1c32",
+                      "surface": "#fbf9fb",
+                      "secondary-fixed": "#e4e2de",
+                      "inverse-surface": "#303032",
+                      "on-error": "#ffffff",
+                      "on-background": "#1b1b1d",
+                      "tertiary-fixed-dim": "#e7bf99",
+                      "on-tertiary-container": "#9f7d5b",
+                      "surface-container-high": "#eae7ea",
+                      "sage-green": "#8A9A5B",
+                      "surface-bright": "#fbf9fb",
+                      "ink-blue": "#112240",
+                      "inverse-on-surface": "#f2f0f2",
+                      "surface-container-low": "#f5f3f5",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#0d1c32",
+                      "on-secondary-container": "#636360",
+                      "outline": "#75777e",
+                      "alert-crimson": "#93272C",
+                      "tertiary": "#000000",
+                      "on-tertiary-fixed": "#2b1701",
+                      "inverse-primary": "#b9c7e4",
+                      "secondary": "#5e5e5c",
+                      "on-primary-container": "#76849f",
+                      "on-primary-fixed-variant": "#39475f",
+                      "primary-fixed-dim": "#b9c7e4",
+                      "secondary-fixed-dim": "#c8c6c3",
+                      "tertiary-fixed": "#ffdcbd",
+                      "error-container": "#ffdad6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-mobile": "20px",
+                      "base": "8px",
+                      "gutter": "24px",
+                      "container-max": "1200px",
+                      "margin-desktop": "40px"
+              },
+              "fontFamily": {
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Playfair Display"
+                      ],
+                      "display-lg": [
+                              "Playfair Display"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Playfair Display"
+                      ],
+                      "headline-lg-mobile": [
+                              "Playfair Display"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Playfair Display"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .botanical-bg {
+            background-color: #fbf9fb; /* background color */
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.83-54.627 54.627-.83-.83L54.627 0zm-4 0l.83.83-50.627 50.627-.83-.83L50.627 0zm-4 0l.83.83-46.627 46.627-.83-.83L46.627 0zm-4 0l.83.83-42.627 42.627-.83-.83L42.627 0zm-4 0l.83.83-38.627 38.627-.83-.83L38.627 0zm-4 0l.83.83-34.627 34.627-.83-.83L34.627 0zm-4 0l.83.83-30.627 30.627-.83-.83L30.627 0zm-4 0l.83.83-26.627 26.627-.83-.83L26.627 0zm-4 0l.83.83-22.627 22.627-.83-.83L22.627 0zm-4 0l.83.83-18.627 18.627-.83-.83L18.627 0zm-4 0l.83.83-14.627 14.627-.83-.83L14.627 0zm-4 0l.83.83-10.627 10.627-.83-.83L10.627 0zm-4 0l.83.83-6.627 6.627-.83-.83L6.627 0zm-4 0l.83.83-2.627 2.627-.83-.83L2.627 0zM60 5.373l-.83-.83-54.627 54.627.83.83L60 5.373zm0 4l-.83-.83-50.627 50.627.83.83L60 9.373zm0 4l-.83-.83-46.627 46.627.83.83L60 13.373zm0 4l-.83-.83-42.627 42.627.83.83L60 17.373zm0 4l-.83-.83-38.627 38.627.83.83L60 21.373zm0 4l-.83-.83-34.627 34.627.83.83L60 25.373zm0 4l-.83-.83-30.627 30.627.83.83L60 29.373zm0 4l-.83-.83-26.627 26.627.83.83L60 33.373zm0 4l-.83-.83-22.627 22.627.83.83L60 37.373zm0 4l-.83-.83-18.627 18.627.83.83L60 41.373zm0 4l-.83-.83-14.627 14.627.83.83L60 45.373zm0 4l-.83-.83-10.627 10.627.83.83L60 49.373zm0 4l-.83-.83-6.627 6.627.83.83L60 53.373zm0 4l-.83-.83-2.627 2.627.83.83L60 57.373z' fill='%23e8e4d9' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="botanical-bg min-h-screen flex flex-col justify-center items-center p-margin-mobile md:p-margin-desktop text-on-surface">
+<main class="w-full max-w-md">
+<!-- Logo Section -->
+<div class="flex flex-col items-center mb-8">
+<span class="material-symbols-outlined text-6xl text-primary mb-2" data-weight="fill" style="font-variation-settings: 'FILL' 1;">
+                menu_book
+            </span>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Biblio</h1>
+<p class="font-body-md text-body-md text-secondary mt-1">Sistem Manajemen Perpustakaan</p>
+</div>
+<!-- Login Card -->
+<div class="bg-surface-container-lowest border border-paper-shadow rounded-xl p-6 md:p-8 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] relative overflow-hidden">
+<!-- Spine decoration -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-antique-gold/20"></div>
+<h2 class="font-headline-md text-headline-md text-primary mb-6 text-center">Masuk ke Akun Anda</h2>
+<form action="#" class="space-y-6" method="POST">
+<!-- Email Input -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block" for="email">Email Institusi</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-0 top-1/2 -translate-y-1/2 text-outline-variant pl-3">mail</span>
+<input class="w-full bg-transparent border-0 border-b border-paper-shadow pl-10 py-2 focus:ring-0 focus:border-antique-gold transition-colors font-body-md text-body-md placeholder-outline-variant" id="email" name="email" placeholder="nama@institusi.ac.id" required="" type="email"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block" for="kata_sandi">Kata Sandi</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-0 top-1/2 -translate-y-1/2 text-outline-variant pl-3">lock</span>
+<input class="w-full bg-transparent border-0 border-b border-paper-shadow pl-10 py-2 focus:ring-0 focus:border-antique-gold transition-colors font-body-md text-body-md placeholder-outline-variant" id="kata_sandi" name="kata_sandi" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<!-- Role Selector -->
+<div class="space-y-2 pt-2">
+<label class="font-label-md text-label-md text-on-surface-variant block mb-3">Masuk Sebagai</label>
+<div class="flex gap-4">
+<label class="flex-1 cursor-pointer">
+<input checked="" class="peer sr-only" name="peran" type="radio" value="mahasiswa"/>
+<div class="text-center py-2 px-4 border border-paper-shadow rounded-lg peer-checked:border-antique-gold peer-checked:bg-antique-gold/10 peer-checked:text-antique-gold transition-all">
+<span class="font-label-sm text-label-sm">Mahasiswa</span>
+</div>
+</label>
+<label class="flex-1 cursor-pointer">
+<input class="peer sr-only" name="peran" type="radio" value="pustakawan"/>
+<div class="text-center py-2 px-4 border border-paper-shadow rounded-lg peer-checked:border-antique-gold peer-checked:bg-antique-gold/10 peer-checked:text-antique-gold transition-all">
+<span class="font-label-sm text-label-sm">Pustakawan</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-lg hover:bg-primary/90 transition-colors mt-8 shadow-sm" type="submit">
+                    Masuk
+                </button>
+</form>
+<div class="mt-6 text-center">
+<p class="font-body-sm text-body-sm text-secondary">
+                    Belum memiliki akun? <a class="text-antique-gold hover:underline font-medium" href="#">Daftar sekarang</a>
+</p>
+</div>
+</div>
+</main>
+</body></html>

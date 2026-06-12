@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Biblio - Katalog Buku</title>
+<!-- Google Fonts: Playfair Display & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed-variant": "#474744",
+                      "surface-container": "#efedef",
+                      "background": "#fbf9fb",
+                      "on-surface-variant": "#44474d",
+                      "outline-variant": "#c5c6cd",
+                      "surface-variant": "#e4e2e4",
+                      "antique-gold": "#C5A059",
+                      "on-tertiary-fixed-variant": "#5d4124",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#dbd9db",
+                      "tertiary-container": "#2b1701",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed": "#d6e3ff",
+                      "on-primary": "#ffffff",
+                      "paper-shadow": "#E8E4D9",
+                      "surface-container-highest": "#e4e2e4",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed": "#1b1c1a",
+                      "secondary-container": "#e1dfdc",
+                      "surface-tint": "#515f78",
+                      "primary": "#000000",
+                      "on-surface": "#1b1b1d",
+                      "primary-container": "#0d1c32",
+                      "surface": "#fbf9fb",
+                      "secondary-fixed": "#e4e2de",
+                      "inverse-surface": "#303032",
+                      "on-error": "#ffffff",
+                      "on-background": "#1b1b1d",
+                      "tertiary-fixed-dim": "#e7bf99",
+                      "on-tertiary-container": "#9f7d5b",
+                      "surface-container-high": "#eae7ea",
+                      "sage-green": "#8A9A5B",
+                      "surface-bright": "#fbf9fb",
+                      "ink-blue": "#112240",
+                      "inverse-on-surface": "#f2f0f2",
+                      "surface-container-low": "#f5f3f5",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#0d1c32",
+                      "on-secondary-container": "#636360",
+                      "outline": "#75777e",
+                      "alert-crimson": "#93272C",
+                      "tertiary": "#000000",
+                      "on-tertiary-fixed": "#2b1701",
+                      "inverse-primary": "#b9c7e4",
+                      "secondary": "#5e5e5c",
+                      "on-primary-container": "#76849f",
+                      "on-primary-fixed-variant": "#39475f",
+                      "primary-fixed-dim": "#b9c7e4",
+                      "secondary-fixed-dim": "#c8c6c3",
+                      "tertiary-fixed": "#ffdcbd",
+                      "error-container": "#ffdad6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-mobile": "20px",
+                      "base": "8px",
+                      "gutter": "24px",
+                      "container-max": "1200px",
+                      "margin-desktop": "40px"
+              },
+              "fontFamily": {
+                      "body-sm": ["Inter"],
+                      "headline-lg": ["Playfair Display"],
+                      "display-lg": ["Playfair Display"],
+                      "label-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Playfair Display"],
+                      "headline-lg-mobile": ["Playfair Display"],
+                      "body-md": ["Inter"],
+                      "headline-sm": ["Playfair Display"],
+                      "label-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        /* Subtle book edge shadow utility */
+        .book-shadow {
+            box-shadow: -2px 0 5px rgba(0,0,0,0.03), 0 4px 15px rgba(0,0,0,0.05);
+        }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #e4e2de; /* secondary-fixed */
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md min-h-screen flex flex-col selection:bg-antique-gold selection:text-primary">
+<!-- TopNavBar -->
+<header class="bg-background border-b border-outline-variant w-full sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto h-16">
+<!-- Brand -->
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-antique-gold" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+<span class="text-headline-md font-headline-md font-bold text-primary tracking-tight">Biblio</span>
+</div>
+<!-- Navigation Links (Desktop) -->
+<nav class="hidden md:flex items-center gap-8 h-full">
+<a class="text-primary font-bold border-b-2 border-antique-gold pb-1 h-full flex items-center pt-1 text-label-md font-label-md" href="#">Katalog</a>
+<a class="text-on-surface-variant font-medium hover:text-antique-gold transition-colors duration-200 h-full flex items-center text-label-md font-label-md" href="#">Pinjaman</a>
+<a class="text-on-surface-variant font-medium hover:text-antique-gold transition-colors duration-200 h-full flex items-center text-label-md font-label-md" href="#">Dashboard</a>
+<a class="text-on-surface-variant font-medium hover:text-antique-gold transition-colors duration-200 h-full flex items-center text-label-md font-label-md" href="#">Anggota</a>
+</nav>
+<!-- Search & Actions -->
+<div class="flex items-center gap-4">
+<div class="hidden md:flex relative items-center">
+<span class="material-symbols-outlined absolute left-3 text-outline text-[20px]">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-paper-shadow rounded-full text-body-sm font-body-sm focus:outline-none focus:border-antique-gold focus:ring-1 focus:ring-antique-gold w-64 transition-all placeholder:text-outline-variant" placeholder="Cari judul, penulis, isbn..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:text-antique-gold transition-colors duration-200 flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 md:py-12 flex flex-col md:flex-row gap-gutter">
+<!-- Filter Sidebar -->
+<aside class="w-full md:w-64 flex-shrink-0 flex flex-col gap-8">
+<div class="bg-surface-container-lowest rounded-lg border border-paper-shadow p-6 book-shadow">
+<h2 class="text-label-md font-label-md text-primary mb-4 uppercase tracking-widest border-b border-paper-shadow pb-2">Kategori</h2>
+<div class="flex flex-col gap-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded border-outline-variant text-antique-gold focus:ring-antique-gold bg-transparent checked:bg-antique-gold" type="checkbox"/>
+<span class="text-body-sm font-body-sm text-secondary group-hover:text-primary transition-colors">Semua Kategori</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 rounded border-outline-variant text-antique-gold focus:ring-antique-gold bg-transparent checked:bg-antique-gold" type="checkbox"/>
+<span class="text-body-sm font-body-sm text-secondary group-hover:text-primary transition-colors">Fiksi</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 rounded border-outline-variant text-antique-gold focus:ring-antique-gold bg-transparent checked:bg-antique-gold" type="checkbox"/>
+<span class="text-body-sm font-body-sm text-secondary group-hover:text-primary transition-colors">Non-Fiksi</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 rounded border-outline-variant text-antique-gold focus:ring-antique-gold bg-transparent checked:bg-antique-gold" type="checkbox"/>
+<span class="text-body-sm font-body-sm text-secondary group-hover:text-primary transition-colors">Referensi</span>
+</label>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-lg border border-paper-shadow p-6 book-shadow">
+<h2 class="text-label-md font-label-md text-primary mb-4 uppercase tracking-widest border-b border-paper-shadow pb-2">Ketersediaan</h2>
+<div class="flex flex-col gap-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 border-outline-variant text-antique-gold focus:ring-antique-gold bg-transparent" name="availability" type="radio"/>
+<span class="text-body-sm font-body-sm text-secondary group-hover:text-primary transition-colors">Semua Status</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-4 h-4 border-outline-variant text-antique-gold focus:ring-antique-gold bg-transparent" name="availability" type="radio"/>
+<span class="text-body-sm font-body-sm text-secondary group-hover:text-primary transition-colors">Tersedia</span>
+</label>
+</div>
+</div>
+</aside>
+<!-- Book Catalog Grid -->
+<section class="flex-grow flex flex-col">
+<!-- Header/Results info -->
+<div class="flex justify-between items-end mb-6 pb-2 border-b border-paper-shadow">
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-primary">Katalog Terkini</h1>
+<span class="text-body-sm font-body-sm text-secondary">Menampilkan 12 buku</span>
+</div>
+<!-- Bento-style Grid for Books -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Book Card 1 (Fiksi) -->
+<article class="bg-surface-container-lowest border border-paper-shadow rounded-DEFAULT overflow-hidden flex flex-col h-full group book-shadow transition-transform hover:-translate-y-1 duration-300 relative border-l-4 border-l-ink-blue">
+<div class="w-full aspect-[2/3] bg-surface-container-high relative overflow-hidden">
+<img alt="Book Cover" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" data-alt="A beautifully designed book cover for a classic Indonesian fiction novel. The cover features an elegant, minimalist illustration of an old colonial-era train in subtle sepia and ink-blue tones. The overall aesthetic is warm, academic, and slightly vintage, utilizing a cream-colored background with high-contrast serif typography. The lighting is soft and ambient, suggesting the quiet atmosphere of a university reading room." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt_Ae09LPmKbV0IkhQUUpgtpX9GX8_0mNi1PJwsGr8tYhwrMxueiva7rAH_j_dLsw2Nx67221aHEpf5X-XXHXDQlBlLeG1htvKgbueZeYec6DbbMAqEpNd2VTpUxVIPqLGf9PVMvDc_bl0gLFPua4SNzVs81e9g_cUSL3vooQhtGFZN2ZQigboD9DZ0zFwOTaFkCJ33yUPRJKX6yJ2kAdV3ucm7QjIWqjaU_GRkL0x3f8JnD_LEtIWdIPAioPd-AzZimyeyaXDanY"/>
+<div class="absolute top-2 right-2 bg-surface-container-lowest/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-label-sm text-sage-green uppercase tracking-wider font-semibold border border-paper-shadow">Tersedia</div>
+</div>
+<div class="p-4 flex flex-col flex-grow bg-surface-container-lowest">
+<span class="text-[10px] font-label-sm text-antique-gold uppercase tracking-widest mb-1">Fiksi</span>
+<h3 class="text-headline-sm font-headline-sm text-primary mb-1 line-clamp-2 leading-tight">Gadis Kretek</h3>
+<p class="text-body-sm font-body-sm text-secondary mb-3">Ratih Kumala</p>
+<p class="text-[11px] font-label-sm text-outline-variant mb-4 font-mono">ISBN: 978-602-03-2425-4</p>
+<div class="mt-auto pt-4 border-t border-surface-container w-full">
+<button class="w-full py-2 bg-sage-green hover:bg-sage-green/90 text-on-primary text-label-md font-label-md rounded-DEFAULT transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">bookmark_add</span>
+                                Pinjam Buku
+                            </button>
+</div>
+</div>
+</article>
+<!-- Book Card 2 (Non-Fiksi) -->
+<article class="bg-surface-container-lowest border border-paper-shadow rounded-DEFAULT overflow-hidden flex flex-col h-full group book-shadow transition-transform hover:-translate-y-1 duration-300 relative border-l-4 border-l-antique-gold">
+<div class="w-full aspect-[2/3] bg-surface-container-high relative overflow-hidden">
+<img alt="Book Cover" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" data-alt="A modern, sophisticated book cover for a non-fiction historical text. The design is highly structured, featuring a minimalist geometric composition in deep navy, antique gold, and warm cream colors. The typography is dominant, utilizing a classic, heavy serif font reminiscent of academic journals. The lighting suggests a bright, contemporary study space with soft, natural light casting gentle shadows across the matte paper texture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqTucOWXMVLPQ8wDK33HY6ZGMpwwBsnMP1-egp4IG6QFehpRKvHwvcUeEm74ax0FLTrOkZNuyZaLcwRJB5M4g51hi6t6H6SIHxhsIhWPD3ssME8ToYNeCmCiWCbFbEIsDM723fTGhARV4SVSawLyOX4PL6jSKIoqV2Jc1Qd1L-9GW0xeM5vIdHsMDH29y8jklr_2DdI2U7JA0yYTZ5QlLx046oCZ8q0_uuLnOGZ3fAc-T5AaXuDsuVUX9VtlS5znqo5JEv_mhShrg"/>
+<div class="absolute top-2 right-2 bg-surface-container-lowest/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-label-sm text-sage-green uppercase tracking-wider font-semibold border border-paper-shadow">Tersedia</div>
+</div>
+<div class="p-4 flex flex-col flex-grow bg-surface-container-lowest">
+<span class="text-[10px] font-label-sm text-antique-gold uppercase tracking-widest mb-1">Non-Fiksi</span>
+<h3 class="text-headline-sm font-headline-sm text-primary mb-1 line-clamp-2 leading-tight">Sapiens: Riwayat Singkat Umat Manusia</h3>
+<p class="text-body-sm font-body-sm text-secondary mb-3">Yuval Noah Harari</p>
+<p class="text-[11px] font-label-sm text-outline-variant mb-4 font-mono">ISBN: 978-602-424-633-5</p>
+<div class="mt-auto pt-4 border-t border-surface-container w-full">
+<button class="w-full py-2 bg-sage-green hover:bg-sage-green/90 text-on-primary text-label-md font-label-md rounded-DEFAULT transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">bookmark_add</span>
+                                Pinjam Buku
+                            </button>
+</div>
+</div>
+</article>
+<!-- Book Card 3 (Referensi - Dipinjam) -->
+<article class="bg-surface-container-lowest border border-paper-shadow rounded-DEFAULT overflow-hidden flex flex-col h-full group book-shadow transition-transform hover:-translate-y-1 duration-300 relative border-l-4 border-l-secondary-fixed">
+<div class="w-full aspect-[2/3] bg-surface-container-high relative overflow-hidden opacity-75">
+<img alt="Book Cover" class="w-full h-full object-cover grayscale-[30%] transition-all duration-500" data-alt="A weighty, authoritative reference book cover, akin to an encyclopedia or advanced dictionary. The design is stark and academic, featuring a very dark, textured background resembling aged leather. The text is embossed in a muted gold serif font. The image captures the essence of a traditional, physical library archive, with subtle dust motes visible in the soft, focused lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlyz0-RRRx4f7bT4vVdV_0reuxU41u7bw1JbvOxYyHKK_zyGmDipuy8nJ7S4u5nqFa__ueiaa1MT3iK3RGgvDMvNYCpB2_bkcrsbjmNnZZN7a2LZQoT-MgorAtaVwrL8zZAKykofnEJkP1sZsy1f0hIENcSnR35eDNwTh09bxOyOsRT6Bbh7psb3K8KWWIr3Jae1X9lFtMfpGRKzeyiIovP_hm169g-wtpWYetl5kQxuMG_RF_lwXJ_eDSExHiehbAvgGbv2hlhzU"/>
+<div class="absolute top-2 right-2 bg-surface-container-highest/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-label-sm text-on-surface-variant uppercase tracking-wider font-semibold border border-outline-variant">Dipinjam</div>
+</div>
+<div class="p-4 flex flex-col flex-grow bg-surface-container-lowest">
+<span class="text-[10px] font-label-sm text-secondary uppercase tracking-widest mb-1">Referensi</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface-variant mb-1 line-clamp-2 leading-tight">Kamus Besar Bahasa Indonesia</h3>
+<p class="text-body-sm font-body-sm text-secondary mb-3">Badan Pengembangan Bahasa</p>
+<p class="text-[11px] font-label-sm text-outline-variant mb-4 font-mono">ISBN: 978-979-22-3841-9</p>
+<div class="mt-auto pt-4 border-t border-surface-container w-full">
+<button class="w-full py-2 bg-surface-container border border-outline-variant text-on-surface-variant text-label-md font-label-md rounded-DEFAULT cursor-not-allowed flex items-center justify-center gap-2" disabled="">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+                                Tidak Tersedia
+                            </button>
+</div>
+</div>
+</article>
+<!-- Book Card 4 (Fiksi) -->
+<article class="bg-surface-container-lowest border border-paper-shadow rounded-DEFAULT overflow-hidden flex flex-col h-full group book-shadow transition-transform hover:-translate-y-1 duration-300 relative border-l-4 border-l-ink-blue">
+<div class="w-full aspect-[2/3] bg-surface-container-high relative overflow-hidden">
+<img alt="Book Cover" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" data-alt="An artistic, abstract book cover for a piece of contemporary literary fiction. The imagery consists of soft, blurred organic shapes in muted sage green and warm cream, creating a dreamlike, contemplative mood. The typography is modern and highly legible, striking a balance between corporate precision and artistic flair. The lighting is diffused, giving the cover a smooth, matte finish." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_rXZBR67aCpiXHG9U2_rDB8j3hpexgN-B7gyaRz04h2gdgOmSNBQIaDMwjNeWexwyI_NGyTO46D3RQTv2tcgd89ndyftvNr-J01D3PVC8G3slmVYtzMcWi_JvKJ8dfGdK36a5pOo1KKBWsHPq4Yvor6GlASO2jyPknM60RB5Ow3KIbGxXeXk-CBqHpPTedynithQwwRgV_uqMv_SRAukdkfKGbCjN0kxHSGMe0TFmJdu0n70lueA1DUURJAriDyReWbGV8OyIUNg"/>
+<div class="absolute top-2 right-2 bg-surface-container-lowest/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-label-sm text-sage-green uppercase tracking-wider font-semibold border border-paper-shadow">Tersedia</div>
+</div>
+<div class="p-4 flex flex-col flex-grow bg-surface-container-lowest">
+<span class="text-[10px] font-label-sm text-antique-gold uppercase tracking-widest mb-1">Fiksi</span>
+<h3 class="text-headline-sm font-headline-sm text-primary mb-1 line-clamp-2 leading-tight">Cantik Itu Luka</h3>
+<p class="text-body-sm font-body-sm text-secondary mb-3">Eka Kurniawan</p>
+<p class="text-[11px] font-label-sm text-outline-variant mb-4 font-mono">ISBN: 978-602-220-115-6</p>
+<div class="mt-auto pt-4 border-t border-surface-container w-full">
+<button class="w-full py-2 bg-sage-green hover:bg-sage-green/90 text-on-primary text-label-md font-label-md rounded-DEFAULT transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">bookmark_add</span>
+                                Pinjam Buku
+                            </button>
+</div>
+</div>
+</article>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-primary dark:bg-primary-container w-full py-12 px-margin-mobile md:px-margin-desktop mt-auto border-t-[8px] border-antique-gold">
+<div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+<div class="flex flex-col gap-2">
+<span class="text-headline-sm font-headline-sm text-secondary dark:text-secondary-fixed flex items-center gap-2">
+<span class="material-symbols-outlined">auto_stories</span>
+                    Biblio
+                </span>
+<p class="text-body-sm font-body-sm text-on-primary/80 dark:text-on-primary-container/80">Sistem Manajemen Perpustakaan</p>
+</div>
+<div class="flex flex-wrap gap-6 md:gap-8">
+<a class="text-on-primary dark:text-on-primary-container opacity-80 hover:text-antique-gold hover:opacity-100 transition-opacity text-label-sm font-label-sm" href="#">Pusat Bantuan</a>
+<a class="text-on-primary dark:text-on-primary-container opacity-80 hover:text-antique-gold hover:opacity-100 transition-opacity text-label-sm font-label-sm" href="#">Kebijakan Privasi</a>
+<a class="text-on-primary dark:text-on-primary-container opacity-80 hover:text-antique-gold hover:opacity-100 transition-opacity text-label-sm font-label-sm" href="#">Syarat &amp; Ketentuan</a>
+<a class="text-on-primary dark:text-on-primary-container opacity-80 hover:text-antique-gold hover:opacity-100 transition-opacity text-label-sm font-label-sm" href="#">Kontak</a>
+</div>
+</div>
+<div class="max-w-container-max mx-auto mt-8 pt-8 border-t border-on-primary/20 text-center">
+<p class="text-body-sm font-body-sm text-on-primary/60 dark:text-on-primary-container/60">© 2024 Biblio Library System. All rights reserved.</p>
+</div>
+</footer>
+</body></html>

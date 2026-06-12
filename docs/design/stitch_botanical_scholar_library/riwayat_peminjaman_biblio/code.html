@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Biblio - Riwayat Peminjaman</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed-variant": "#474744",
+                      "surface-container": "#efedef",
+                      "background": "#fbf9fb",
+                      "on-surface-variant": "#44474d",
+                      "outline-variant": "#c5c6cd",
+                      "surface-variant": "#e4e2e4",
+                      "antique-gold": "#C5A059",
+                      "on-tertiary-fixed-variant": "#5d4124",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#dbd9db",
+                      "tertiary-container": "#2b1701",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed": "#d6e3ff",
+                      "on-primary": "#ffffff",
+                      "paper-shadow": "#E8E4D9",
+                      "surface-container-highest": "#e4e2e4",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed": "#1b1c1a",
+                      "secondary-container": "#e1dfdc",
+                      "surface-tint": "#515f78",
+                      "primary": "#000000",
+                      "on-surface": "#1b1b1d",
+                      "primary-container": "#0d1c32",
+                      "surface": "#fbf9fb",
+                      "secondary-fixed": "#e4e2de",
+                      "inverse-surface": "#303032",
+                      "on-error": "#ffffff",
+                      "on-background": "#1b1b1d",
+                      "tertiary-fixed-dim": "#e7bf99",
+                      "on-tertiary-container": "#9f7d5b",
+                      "surface-container-high": "#eae7ea",
+                      "sage-green": "#8A9A5B",
+                      "surface-bright": "#fbf9fb",
+                      "ink-blue": "#112240",
+                      "inverse-on-surface": "#f2f0f2",
+                      "surface-container-low": "#f5f3f5",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#0d1c32",
+                      "on-secondary-container": "#636360",
+                      "outline": "#75777e",
+                      "alert-crimson": "#93272C",
+                      "tertiary": "#000000",
+                      "on-tertiary-fixed": "#2b1701",
+                      "inverse-primary": "#b9c7e4",
+                      "secondary": "#5e5e5c",
+                      "on-primary-container": "#76849f",
+                      "on-primary-fixed-variant": "#39475f",
+                      "primary-fixed-dim": "#b9c7e4",
+                      "secondary-fixed-dim": "#c8c6c3",
+                      "tertiary-fixed": "#ffdcbd",
+                      "error-container": "#ffdad6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-mobile": "20px",
+                      "base": "8px",
+                      "gutter": "24px",
+                      "container-max": "1200px",
+                      "margin-desktop": "40px"
+              },
+              "fontFamily": {
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Playfair Display"
+                      ],
+                      "display-lg": [
+                              "Playfair Display"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Playfair Display"
+                      ],
+                      "headline-lg-mobile": [
+                              "Playfair Display"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Playfair Display"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .table-striped tbody tr:nth-child(odd) {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased flex flex-col min-h-screen">
+<!-- TopNavBar (Hidden on Mobile due to SideNav intent, but included per JSON instructions if deemed top level, however this is a specific table view. Using TopAppBar for layout anchor) -->
+<header class="bg-background dark:bg-inverse-surface border-b border-outline-variant dark:border-outline flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto h-16 sticky top-0 z-50">
+<div class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-3xl text-antique-gold">menu_book</span>
+            Biblio
+        </div>
+<nav class="hidden md:flex space-x-8">
+<a class="text-on-surface-variant dark:text-surface-variant font-medium text-label-md font-label-md hover:text-antique-gold transition-colors duration-200" href="#">Katalog</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-medium text-label-md font-label-md hover:text-antique-gold transition-colors duration-200" href="#">Pinjaman</a>
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-antique-gold pb-1 text-label-md font-label-md hover:text-antique-gold transition-colors duration-200 opacity-80 transition-all duration-200" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-medium text-label-md font-label-md hover:text-antique-gold transition-colors duration-200" href="#">Anggota</a>
+</nav>
+<div class="flex items-center">
+<button class="text-primary dark:text-primary-fixed-dim hover:text-antique-gold transition-colors duration-200">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col bg-surface-container-low dark:bg-surface-container-highest border-r border-paper-shadow dark:border-outline fixed left-0 top-16 h-[calc(100vh-64px)] w-64 overflow-y-auto z-40">
+<div class="p-6 border-b border-paper-shadow">
+<h2 class="text-headline-sm font-headline-sm text-primary dark:text-primary-fixed-dim">Panel Kontrol</h2>
+<p class="text-body-sm font-body-sm text-secondary mt-1">Librarian Access</p>
+</div>
+<nav class="flex-1 py-4">
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 text-label-sm font-label-sm flex items-center gap-3 hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">library_books</span> Semua Buku
+                </a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 text-label-sm font-label-sm flex items-center gap-3 hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">auto_stories</span> Fiksi
+                </a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 text-label-sm font-label-sm flex items-center gap-3 hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">history_edu</span> Non-Fiksi
+                </a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 text-label-sm font-label-sm flex items-center gap-3 hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">menu_book</span> Referensi
+                </a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 text-label-sm font-label-sm flex items-center gap-3 hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">group_add</span> Manajemen Anggota
+                </a>
+<a class="bg-primary-container text-on-primary-container font-semibold rounded-lg mx-2 my-1 px-4 py-3 text-label-sm font-label-sm flex items-center gap-3 scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">assessment</span> Laporan Harian
+                </a>
+</nav>
+<div class="p-4 mt-auto">
+<button class="w-full bg-primary text-secondary hover:bg-ink-blue py-2 px-4 rounded font-label-md text-label-md transition-colors shadow-sm flex justify-center items-center gap-2 text-on-primary">
+<span class="material-symbols-outlined">add</span> Tambah Koleksi
+                </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full md:pl-64 overflow-y-auto">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<div>
+<h1 class="text-headline-lg font-headline-lg text-primary">Riwayat Peminjaman</h1>
+<p class="text-body-md font-body-md text-secondary mt-2">Daftar komprehensif transaksi perpustakaan dan status pengembalian.</p>
+</div>
+<!-- Search & Filter Controls -->
+<div class="flex items-center gap-3 w-full md:w-auto">
+<div class="relative w-full md:w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface border border-outline-variant rounded-DEFAULT text-body-sm focus:outline-none focus:border-antique-gold focus:ring-1 focus:ring-antique-gold transition-shadow" placeholder="Cari mahasiswa atau buku..." type="text"/>
+</div>
+<button class="p-2 bg-surface border border-outline-variant rounded-DEFAULT text-primary hover:text-antique-gold hover:border-antique-gold transition-colors" title="Filter">
+<span class="material-symbols-outlined">tune</span>
+</button>
+</div>
+</div>
+<!-- Bento Grid / Glassmorphism Data Container -->
+<div class="bg-surface-container-lowest rounded-xl border border-paper-shadow overflow-hidden" style="box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse table-striped">
+<thead>
+<tr class="bg-primary text-on-primary text-label-md font-label-md border-b border-primary">
+<th class="py-4 px-6 whitespace-nowrap">Mahasiswa</th>
+<th class="py-4 px-6 whitespace-nowrap">Buku</th>
+<th class="py-4 px-6 whitespace-nowrap">Tanggal Pinjam</th>
+<th class="py-4 px-6 whitespace-nowrap">Tanggal Tenggat</th>
+<th class="py-4 px-6 whitespace-nowrap text-center">Status</th>
+<th class="py-4 px-6 whitespace-nowrap text-right">Denda</th>
+<th class="py-4 px-6 whitespace-nowrap text-center">Aksi</th>
+</tr>
+</thead>
+<tbody class="text-body-sm font-body-sm text-on-surface">
+<!-- Row 1: Overdue -->
+<tr class="border-b border-paper-shadow hover:bg-surface-container-low transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-primary font-bold">AJ</div>
+<div>
+<p class="font-medium">Andi Wijaya</p>
+<p class="text-label-sm text-secondary">TI-2021</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<p class="font-medium text-primary">Sistem Basis Data</p>
+<p class="text-label-sm text-secondary">Rinaldi Munir</p>
+</td>
+<td class="py-4 px-6 text-secondary">10 Okt 2023</td>
+<td class="py-4 px-6 text-alert-crimson font-medium">24 Okt 2023</td>
+<td class="py-4 px-6 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-medium bg-error-container text-on-error-container border border-alert-crimson">
+                                            Terlambat
+                                        </span>
+</td>
+<td class="py-4 px-6 text-right font-medium text-alert-crimson">Rp 5.000</td>
+<td class="py-4 px-6 text-center">
+<button class="text-secondary hover:text-primary transition-colors p-1" title="Detail">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: Returned -->
+<tr class="border-b border-paper-shadow hover:bg-surface-container-low transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-primary font-bold">BS</div>
+<div>
+<p class="font-medium">Budi Santoso</p>
+<p class="text-label-sm text-secondary">SI-2022</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<p class="font-medium text-primary">Kalkulus Lanjut</p>
+<p class="text-label-sm text-secondary">James Stewart</p>
+</td>
+<td class="py-4 px-6 text-secondary">15 Okt 2023</td>
+<td class="py-4 px-6 text-secondary">29 Okt 2023</td>
+<td class="py-4 px-6 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-medium bg-sage-green/20 text-sage-green border border-sage-green">
+                                            Kembali
+                                        </span>
+</td>
+<td class="py-4 px-6 text-right text-secondary">-</td>
+<td class="py-4 px-6 text-center">
+<button class="text-secondary hover:text-primary transition-colors p-1" title="Detail">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Active/Borrowed -->
+<tr class="border-b border-paper-shadow hover:bg-surface-container-low transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-primary font-bold">CP</div>
+<div>
+<p class="font-medium">Citra Permata</p>
+<p class="text-label-sm text-secondary">DKV-2023</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<p class="font-medium text-primary">Sejarah Desain Grafis</p>
+<p class="text-label-sm text-secondary">Philip B. Meggs</p>
+</td>
+<td class="py-4 px-6 text-secondary">25 Okt 2023</td>
+<td class="py-4 px-6 text-secondary">08 Nov 2023</td>
+<td class="py-4 px-6 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-medium bg-primary-container text-on-primary-container border border-primary-fixed">
+                                            Dipinjam
+                                        </span>
+</td>
+<td class="py-4 px-6 text-right text-secondary">-</td>
+<td class="py-4 px-6 text-center">
+<button class="text-secondary hover:text-primary transition-colors p-1" title="Detail">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Active/Borrowed -->
+<tr class="border-b border-paper-shadow hover:bg-surface-container-low transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-primary font-bold">DN</div>
+<div>
+<p class="font-medium">Dian Nugraha</p>
+<p class="text-label-sm text-secondary">TI-2020</p>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<p class="font-medium text-primary">Clean Code</p>
+<p class="text-label-sm text-secondary">Robert C. Martin</p>
+</td>
+<td class="py-4 px-6 text-secondary">28 Okt 2023</td>
+<td class="py-4 px-6 text-secondary">11 Nov 2023</td>
+<td class="py-4 px-6 text-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-medium bg-primary-container text-on-primary-container border border-primary-fixed">
+                                            Dipinjam
+                                        </span>
+</td>
+<td class="py-4 px-6 text-right text-secondary">-</td>
+<td class="py-4 px-6 text-center">
+<button class="text-secondary hover:text-primary transition-colors p-1" title="Detail">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-6 py-4 border-t border-paper-shadow flex items-center justify-between bg-surface-container-lowest">
+<span class="text-body-sm text-secondary">Menampilkan 1-4 dari 124 transaksi</span>
+<div class="flex gap-2">
+<button class="p-1 rounded text-outline hover:bg-surface-variant transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded bg-primary text-on-primary text-body-sm font-medium flex items-center justify-center">1</button>
+<button class="w-8 h-8 rounded hover:bg-surface-variant text-primary text-body-sm font-medium flex items-center justify-center transition-colors">2</button>
+<button class="w-8 h-8 rounded hover:bg-surface-variant text-primary text-body-sm font-medium flex items-center justify-center transition-colors">3</button>
+<button class="p-1 rounded text-primary hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container w-full py-12 px-margin-desktop mt-auto flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto z-50 relative">
+<div class="text-headline-sm font-headline-sm text-secondary dark:text-secondary-fixed mb-4 md:mb-0">
+            Biblio
+        </div>
+<div class="text-body-sm font-body-sm mb-4 md:mb-0 opacity-80">
+            © 2024 Biblio Library System. All rights reserved.
+        </div>
+<nav class="flex space-x-6 text-label-sm font-label-sm">
+<a class="text-on-primary dark:text-on-primary-container opacity-80 hover:text-antique-gold hover:opacity-100 transition-opacity" href="#">Pusat Bantuan</a>
+<a class="text-on-primary dark:text-on-primary-container opacity-80 hover:text-antique-gold hover:opacity-100 transition-opacity" href="#">Kebijakan Privasi</a>
+<a class="text-on-primary dark:text-on-primary-container opacity-80 hover:text-antique-gold hover:opacity-100 transition-opacity" href="#">Syarat &amp; Ketentuan</a>
+<a class="text-on-primary dark:text-on-primary-container opacity-80 hover:text-antique-gold hover:opacity-100 transition-opacity" href="#">Kontak</a>
+</nav>
+</footer>
+</body></html>

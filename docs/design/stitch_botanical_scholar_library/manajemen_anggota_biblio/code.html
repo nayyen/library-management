@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Manajemen Anggota - Biblio Library System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#474744",
+                        "surface-container": "#efedef",
+                        "background": "#fbf9fb",
+                        "on-surface-variant": "#44474d",
+                        "outline-variant": "#c5c6cd",
+                        "surface-variant": "#e4e2e4",
+                        "antique-gold": "#C5A059",
+                        "on-tertiary-fixed-variant": "#5d4124",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#dbd9db",
+                        "tertiary-container": "#2b1701",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#d6e3ff",
+                        "on-primary": "#ffffff",
+                        "paper-shadow": "#E8E4D9",
+                        "surface-container-highest": "#e4e2e4",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1b1c1a",
+                        "secondary-container": "#e1dfdc",
+                        "surface-tint": "#515f78",
+                        "primary": "#000000",
+                        "on-surface": "#1b1b1d",
+                        "primary-container": "#0d1c32",
+                        "surface": "#fbf9fb",
+                        "secondary-fixed": "#e4e2de",
+                        "inverse-surface": "#303032",
+                        "on-error": "#ffffff",
+                        "on-background": "#1b1b1d",
+                        "tertiary-fixed-dim": "#e7bf99",
+                        "on-tertiary-container": "#9f7d5b",
+                        "surface-container-high": "#eae7ea",
+                        "sage-green": "#8A9A5B",
+                        "surface-bright": "#fbf9fb",
+                        "ink-blue": "#112240",
+                        "inverse-on-surface": "#f2f0f2",
+                        "surface-container-low": "#f5f3f5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#0d1c32",
+                        "on-secondary-container": "#636360",
+                        "outline": "#75777e",
+                        "alert-crimson": "#93272C",
+                        "tertiary": "#000000",
+                        "on-tertiary-fixed": "#2b1701",
+                        "inverse-primary": "#b9c7e4",
+                        "secondary": "#5e5e5c",
+                        "on-primary-container": "#76849f",
+                        "on-primary-fixed-variant": "#39475f",
+                        "primary-fixed-dim": "#b9c7e4",
+                        "secondary-fixed-dim": "#c8c6c3",
+                        "tertiary-fixed": "#ffdcbd",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "base": "8px",
+                        "gutter": "24px",
+                        "container-max": "1200px",
+                        "margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Playfair Display"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Playfair Display"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-inverse-surface border-b border-outline-variant dark:border-outline fixed w-full top-0 z-50 h-16">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto h-16">
+<div class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim tracking-tight">
+                Biblio
+            </div>
+<nav class="hidden md:flex gap-gutter items-center">
+<a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-antique-gold transition-colors duration-200" href="#">Katalog</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-antique-gold transition-colors duration-200" href="#">Pinjaman</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-antique-gold transition-colors duration-200" href="#">Dashboard</a>
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-antique-gold pb-1 hover:text-antique-gold transition-colors duration-200 opacity-80 transition-all duration-200" href="#">Anggota</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-body-lg">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-high border-none rounded-DEFAULT focus:ring-1 focus:ring-antique-gold text-body-sm w-48" placeholder="Search..." type="text"/>
+</div>
+<button class="text-primary dark:text-primary-fixed-dim hover:text-antique-gold transition-colors duration-200">
+<span class="material-symbols-outlined text-headline-md">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<div class="flex flex-1 pt-16">
+<!-- SideNavBar -->
+<aside class="bg-surface-container-low dark:bg-surface-container-highest border-r border-paper-shadow dark:border-outline fixed left-0 top-16 h-[calc(100vh-64px)] w-64 overflow-y-auto flex flex-col z-40 hidden md:flex">
+<div class="p-6 border-b border-paper-shadow dark:border-outline">
+<div class="flex items-center gap-4">
+<img alt="Pustakawan Profile" class="w-12 h-12 rounded-full object-cover border border-outline-variant" data-alt="Close up professional portrait of a librarian." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWv2NK1HpdhDg1rWhLF9C8qCn69EIkiwmpl9Zglrnsd6-AVs1qer8hdIEFgZdAhfHuL8mrKXcL4_P2SBdM8f9j_SLD0iFEAEcjRyFJM_0VP0mBop5Y8X4Ljpy6F8fOdigsSZBiyJYAMQdNkNi8sZciz0URy6dZ6QGBCty_B-pLeBaKkXxGv3aBnPA8EyszkOa9zzI59oOLT1rKWuO95FrwAdlzrN9Sm5QZzp4J0sCNe3i6DrSuJwoF4CfspYXoTZND9WOXsDXWBgg"/>
+<div>
+<h2 class="text-headline-sm font-headline-sm text-primary dark:text-primary-fixed-dim">Panel Kontrol</h2>
+<p class="text-label-sm font-label-sm text-secondary">Librarian Access</p>
+</div>
+</div>
+<button class="mt-6 w-full bg-primary text-on-primary py-2 rounded-DEFAULT text-label-md font-label-md hover:bg-opacity-90 transition-opacity">
+                    Tambah Koleksi
+                </button>
+</div>
+<nav class="flex-1 py-4 flex flex-col gap-1">
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">library_books</span>
+<span class="text-label-sm font-label-sm">Semua Buku</span>
+</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="text-label-sm font-label-sm">Fiksi</span>
+</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="text-label-sm font-label-sm">Non-Fiksi</span>
+</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="text-label-sm font-label-sm">Referensi</span>
+</a>
+<a class="bg-primary-container text-on-primary-container font-semibold rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 scale-95 duration-150 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group_add</span>
+<span class="text-label-sm font-label-sm">Manajemen Anggota</span>
+</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:bg-surface-variant dark:hover:bg-inverse-surface rounded-lg mx-2 my-1 px-4 py-3 flex items-center gap-3 hover:bg-paper-shadow dark:hover:bg-outline-variant transition-colors" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span class="text-label-sm font-label-sm">Laporan Harian</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 md:ml-64 p-margin-mobile md:p-margin-desktop max-w-container-max mx-auto w-full">
+<div class="mb-10">
+<h1 class="text-headline-lg font-headline-lg text-primary mb-2">Manajemen Anggota</h1>
+<p class="text-body-md font-body-md text-secondary">Kelola data mahasiswa, status keanggotaan, dan akses peminjaman perpustakaan.</p>
+</div>
+<!-- Toolbar/Filter Section -->
+<div class="bg-surface-container-lowest border border-paper-shadow rounded-lg p-6 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div class="flex-1 w-full md:w-auto relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface-container-low border border-outline-variant rounded-DEFAULT focus:border-antique-gold focus:ring-1 focus:ring-antique-gold text-body-sm outline-none transition-shadow" placeholder="Cari berdasarkan Nama, Email, atau UUID..." type="text"/>
+</div>
+<div class="flex gap-4 w-full md:w-auto">
+<select class="w-full md:w-48 bg-surface-container-low border border-outline-variant rounded-DEFAULT px-4 py-3 text-body-sm focus:border-antique-gold outline-none">
+<option value="">Semua Status</option>
+<option value="aktif">Aktif</option>
+<option value="diblokir">Diblokir</option>
+</select>
+<button class="bg-surface-variant text-on-surface px-4 py-3 rounded-DEFAULT hover:bg-outline-variant transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-body-lg">filter_list</span>
+<span class="text-label-md font-label-md hidden sm:inline">Filter</span>
+</button>
+</div>
+</div>
+<!-- Members List (Bento Grid Style) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Member Card 1 -->
+<div class="bg-surface-container-lowest border border-paper-shadow rounded-xl p-6 hover:shadow-lg hover:shadow-primary/5 transition-shadow duration-300 relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-24 h-24 bg-surface-container-low rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary-fixed text-primary-container rounded-full flex items-center justify-center text-headline-sm font-headline-sm font-bold">
+                                AR
+                            </div>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-primary">Andi Rizky</h3>
+<p class="text-label-sm font-label-sm text-secondary">andi.rizky@student.univ.edu</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full text-label-sm font-label-sm bg-sage-green/20 text-sage-green border border-sage-green/30">Aktif</span>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6 text-body-sm font-body-sm">
+<div class="bg-surface-container-low p-3 rounded-lg border border-paper-shadow">
+<p class="text-secondary mb-1">ID Pengguna</p>
+<p class="text-on-surface font-medium truncate" title="550e8400-e29b-41d4-a716-446655440000">550e8400-e29b...</p>
+</div>
+<div class="bg-surface-container-low p-3 rounded-lg border border-paper-shadow">
+<p class="text-secondary mb-1">Pinjaman Aktif</p>
+<p class="text-on-surface font-medium">2 Buku</p>
+</div>
+</div>
+<div class="flex justify-end gap-3 border-t border-paper-shadow pt-4">
+<button class="px-4 py-2 border border-outline-variant text-secondary rounded-DEFAULT text-label-sm font-label-sm hover:border-primary hover:text-primary transition-colors">
+                            Lihat Detail
+                        </button>
+<button class="px-4 py-2 bg-alert-crimson/10 text-alert-crimson rounded-DEFAULT text-label-sm font-label-sm hover:bg-alert-crimson hover:text-on-error transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-body-lg">block</span>
+                            Blokir
+                        </button>
+</div>
+</div>
+<!-- Member Card 2 -->
+<div class="bg-surface-container-lowest border border-alert-crimson/30 rounded-xl p-6 shadow-sm shadow-alert-crimson/5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-24 h-24 bg-alert-crimson/5 rounded-bl-full -z-10"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-alert-crimson/10 text-alert-crimson rounded-full flex items-center justify-center text-headline-sm font-headline-sm font-bold">
+                                SN
+                            </div>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-primary">Siti Nurbaya</h3>
+<p class="text-label-sm font-label-sm text-secondary">siti.nurbaya@student.univ.edu</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full text-label-sm font-label-sm bg-alert-crimson text-on-error shadow-sm">Diblokir</span>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6 text-body-sm font-body-sm">
+<div class="bg-surface-container-low p-3 rounded-lg border border-paper-shadow">
+<p class="text-secondary mb-1">Denda Tertunggak</p>
+<p class="text-alert-crimson font-medium font-bold">Rp 12.000</p>
+</div>
+<div class="bg-surface-container-low p-3 rounded-lg border border-paper-shadow">
+<p class="text-secondary mb-1">Pinjaman Aktif</p>
+<p class="text-on-surface font-medium">1 Buku (Terlambat)</p>
+</div>
+</div>
+<div class="flex justify-end gap-3 border-t border-paper-shadow pt-4">
+<button class="px-4 py-2 border border-outline-variant text-secondary rounded-DEFAULT text-label-sm font-label-sm hover:border-primary hover:text-primary transition-colors">
+                            Lihat Detail
+                        </button>
+<button class="px-4 py-2 bg-sage-green text-on-primary rounded-DEFAULT text-label-sm font-label-sm hover:opacity-90 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined text-body-lg">lock_open</span>
+                            Buka Blokir
+                        </button>
+</div>
+</div>
+<!-- Member Card 3 -->
+<div class="bg-surface-container-lowest border border-paper-shadow rounded-xl p-6 hover:shadow-lg hover:shadow-primary/5 transition-shadow duration-300 relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-24 h-24 bg-surface-container-low rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary-fixed text-primary-container rounded-full flex items-center justify-center text-headline-sm font-headline-sm font-bold">
+                                BP
+                            </div>
+<div>
+<h3 class="text-headline-sm font-headline-sm text-primary">Budi Prakoso</h3>
+<p class="text-label-sm font-label-sm text-secondary">budi.prakoso@student.univ.edu</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full text-label-sm font-label-sm bg-sage-green/20 text-sage-green border border-sage-green/30">Aktif</span>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6 text-body-sm font-body-sm">
+<div class="bg-surface-container-low p-3 rounded-lg border border-paper-shadow">
+<p class="text-secondary mb-1">ID Pengguna</p>
+<p class="text-on-surface font-medium truncate" title="123e4567-e89b-12d3-a456-426614174000">123e4567-e89b...</p>
+</div>
+<div class="bg-surface-container-low p-3 rounded-lg border border-paper-shadow">
+<p class="text-secondary mb-1">Pinjaman Aktif</p>
+<p class="text-on-surface font-medium">0 Buku</p>
+</div>
+</div>
+<div class="flex justify-end gap-3 border-t border-paper-shadow pt-4">
+<button class="px-4 py-2 border border-outline-variant text-secondary rounded-DEFAULT text-label-sm font-label-sm hover:border-primary hover:text-primary transition-colors">
+                            Lihat Detail
+                        </button>
+<button class="px-4 py-2 bg-alert-crimson/10 text-alert-crimson rounded-DEFAULT text-label-sm font-label-sm hover:bg-alert-crimson hover:text-on-error transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-body-lg">block</span>
+                            Blokir
+                        </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-primary dark:bg-primary-container w-full mt-auto relative z-50">
+<div class="w-full py-12 px-margin-desktop mt-auto flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto">
+<div class="mb-6 md:mb-0">
+<span class="text-headline-sm font-headline-sm text-secondary dark:text-secondary-fixed">Biblio</span>
+<p class="text-body-sm font-body-sm text-on-primary dark:text-on-primary-container mt-2">© 2024 Biblio Library System. All rights reserved.</p>
+</div>
+<nav class="flex flex-wrap gap-6 justify-center">
+<a class="text-label-sm font-label-sm text-on-primary dark:text-on-primary-container opacity-80 hover:text-antique-gold hover:opacity-100 transition-opacity" href="#">Pusat Bantuan</a>
+<a class="text-label-sm font-label-sm text-on-primary dark:text-on-primary-container opacity-80 hover:text-antique-gold hover:opacity-100 transition-opacity" href="#">Kebijakan Privasi</a>
+<a class="text-label-sm font-label-sm text-on-primary dark:text-on-primary-container opacity-80 hover:text-antique-gold hover:opacity-100 transition-opacity" href="#">Syarat &amp; Ketentuan</a>
+<a class="text-label-sm font-label-sm text-on-primary dark:text-on-primary-container opacity-80 hover:text-antique-gold hover:opacity-100 transition-opacity" href="#">Kontak</a>
+</nav>
+</div>
+</footer>
+</body></html>
