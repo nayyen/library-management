@@ -58,6 +58,9 @@ Matches existing `DESIGN.md` tokens — already implemented as Tailwind utility 
 | Body small (body-sm) | 14px | 400 (regular) | 20px (≈1.43) |
 | Label (label-sm) | 12px | 500 (medium) | 16px (≈1.33) |
 | Heading (headline-sm) | 20px | 600 (semibold) | 28px (1.4) |
+| Emphasis (`font-bold`) | — | 700 (bold) | — |
+
+**Note on weight count:** `DESIGN.md` establishes 4 weights project-wide (400/500/600/700 — `headline-lg` already uses 700). `font-bold` (700) is not new to Phase 4: it's the existing convention for avatar-initial circles, already used in `PinjamanPage.jsx` since Phase 3 (lines 424, 519). The two Phase 4 uses below (blocked-member avatar initial, "Denda Tertunggak" amount) follow that same established convention rather than introducing a 5th weight.
 
 Phase 4 usage map:
 - Section headings ("Sedang Dipinjam", "Anggota Diblokir") → `text-headline-sm font-headline-sm text-primary` (matches "Menunggu Persetujuan"/"Siap Diambil")
