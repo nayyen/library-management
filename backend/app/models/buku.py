@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy import String, Integer
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.core.database import Base
@@ -19,3 +19,8 @@ class Buku(Base):
     )
     kategori: Mapped[str] = mapped_column(String(100), nullable=False)
     tahun_terbit: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    # Relationships
+    salinan: Mapped[list["SalinanBuku"]] = relationship(
+        "SalinanBuku", back_populates="buku", lazy="select"
+    )

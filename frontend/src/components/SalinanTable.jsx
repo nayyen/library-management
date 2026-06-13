@@ -2,7 +2,10 @@
  * SalinanTable — displays copies of a book in a table.
  *
  * Props:
- *   salinan : array of { id, lokasi_rak, kondisi, status_ketersediaan }
+ *   salinan       : array of { id, lokasi_rak, kondisi, status_ketersediaan }
+ *   peran         : string    — 'mahasiswa' | 'pustakawan'
+ *   onPinjam      : (salinan) => void — callback when Pinjam is clicked
+ *   pinjamDisabled: boolean   — disable Pinjam button (blocked/at-limit)
  */
 
 const kondisiLabel = {
@@ -23,7 +26,7 @@ const statusColor = {
   dipinjam: 'text-alert-crimson',
 };
 
-export default function SalinanTable({ salinan = [] }) {
+export default function SalinanTable({ salinan = [], peran, onPinjam, pinjamDisabled = false }) {
   if (salinan.length === 0) {
     return (
       <p className="text-body-md font-body-md text-outline-variant italic">
@@ -46,6 +49,11 @@ export default function SalinanTable({ salinan = [] }) {
             <th className="pb-3 text-label-sm font-label-sm text-outline uppercase tracking-wider">
               Status
             </th>
+            {peran === 'mahasiswa' && (
+              <th className="pb-3 text-label-sm font-label-sm text-outline uppercase tracking-wider">
+                Aksi
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -74,6 +82,29 @@ export default function SalinanTable({ salinan = [] }) {
                   {statusLabel[s.status_ketersediaan] ?? s.status_ketersediaan}
                 </span>
               </td>
+              {peran === 'mahasiswa' && (
+                <td className="py-3">
+                  {s.status_ketersediaan === 'tersedia' ? (
+                    <button
+                      type="button"
+                      onClick={() => onPinjam?.(s)}
+                      disabled={pinjamDisabled}
+                      aria-disabled={pinjamDisabled}
+                      aria-label={`Pinjam salinan di ${s.lokasi_rak}`}
+                      className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-label-sm font-label-sm text-white transition-opacity min-h-[44px] ${
+                        pinjamDisabled
+                          ? 'bg-sage-green/50 cursor-not-allowed'
+                          : 'bg-sage-green hover:opacity-90'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[18px]">bookmark_add</span>
+                      Pinjam
+                    </button>
+                  ) : (
+                    <span className="text-body-sm font-body-sm text-outline-variant">&mdash;</span>
+                  )}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

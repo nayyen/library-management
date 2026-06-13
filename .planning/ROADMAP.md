@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation, Schema & Auth** - Scaffolding, docker-compose, full DB schema, and working registration/login with JWT
 - [x] **Phase 2: Book Catalog** - Mahasiswa can search/filter books; pustakawan can manage master books and physical copies
-- [ ] **Phase 3: Loan Request & Approval Workflow** - Mahasiswa can request loans; pustakawan approves/rejects, manages pickup window and handover
+- [x] **Phase 3: Loan Request & Approval Workflow** - Mahasiswa can request loans; pustakawan approves/rejects, manages pickup window and handover
 - [ ] **Phase 4: Returns, Fines & Blocking** - Pustakawan processes returns, system calculates fines, blocks accounts, logs overdue notifications, and clears fines
 - [ ] **Phase 5: Dashboard, Members & Loan History** - Pustakawan dashboard with stats/queues, member management, and mahasiswa loan history view
 
@@ -100,7 +100,17 @@ Plans:
   4. A request left in `siap_diambil` past the 2x24h pickup window automatically becomes `dibatalkan` (verifiable by advancing time or via a scheduled/check job)
   5. A pustakawan can mark a `siap_diambil` loan as physically handed over, moving it to `dipinjam` and setting `tanggal_tenggat` to 14 days from handover
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+**Wave 1**
+- [x] 03-01-PLAN.md — Backend peminjaman API: schemas + router + RED/GREEN tests (17 tests, LOAN-01 through LOAN-06)
+
+**Wave 2** *(blocked on Wave 1)*
+- [x] 03-02-PLAN.md — Mahasiswa loan-request UI: StatusBadge, BlockedBanner, LoanRequestModal, wired Pinjam on catalog detail, PinjamanPage mahasiswa view
+
+**Wave 3** *(blocked on Wave 2)*
+- [x] 03-03-PLAN.md — Pustakawan queue UI: approve/reject/handover actions with ConfirmDialog on PinjamanPage
+
 **UI hint**: yes
 
 ### Phase 4: Returns, Fines & Blocking
@@ -142,7 +152,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation, Schema & Auth | 4/4 | ✅ Complete | 2026-06-12 |
-| 2. Book Catalog | 0/TBD | Not started | - |
-| 3. Loan Request & Approval Workflow | 0/TBD | Not started | - |
+| 2. Book Catalog | 4/4 | ✅ Complete | 2026-06-13 |
+| 3. Loan Request & Approval Workflow | 3/3 | ✅ Complete | 2026-06-13 |
 | 4. Returns, Fines & Blocking | 0/TBD | Not started | - |
 | 5. Dashboard, Members & Loan History | 0/TBD | Not started | - |

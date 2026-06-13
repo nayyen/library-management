@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 from sqlalchemy import String, Integer, DateTime, Enum as SAEnum, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.core.database import Base
@@ -19,6 +19,14 @@ class Peminjaman(Base):
     )
     id_salinan_buku: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("salinan_buku.id"), nullable=False
+    )
+
+    # Relationships for eager-loading
+    pengguna: Mapped["Pengguna"] = relationship(
+        "Pengguna", back_populates="peminjaman", lazy="joined"
+    )
+    salinan_buku: Mapped["SalinanBuku"] = relationship(
+        "SalinanBuku", back_populates="peminjaman", lazy="joined"
     )
     tanggal_pengajuan: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

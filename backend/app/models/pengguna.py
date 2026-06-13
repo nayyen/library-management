@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy import Boolean, String, Enum as SAEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.core.database import Base
@@ -24,4 +24,9 @@ class Pengguna(Base):
     )
     is_diblokir: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False, server_default="false"
+    )
+
+    # Relationships
+    peminjaman: Mapped[list["Peminjaman"]] = relationship(
+        "Peminjaman", back_populates="pengguna", lazy="select"
     )

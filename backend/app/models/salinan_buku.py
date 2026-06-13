@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy import String, Enum as SAEnum, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.core.database import Base
@@ -26,4 +26,10 @@ class SalinanBuku(Base):
         SAEnum(StatusSalinan, name="status_salinan", create_type=False),
         nullable=False,
         default=StatusSalinan.tersedia,
+    )
+
+    # Relationships
+    buku: Mapped["Buku"] = relationship("Buku", back_populates="salinan", lazy="joined")
+    peminjaman: Mapped[list["Peminjaman"]] = relationship(
+        "Peminjaman", back_populates="salinan_buku", lazy="select"
     )
