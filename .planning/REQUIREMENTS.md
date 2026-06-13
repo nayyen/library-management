@@ -1,7 +1,7 @@
-# Requirements: Biblio — Sistem Manajemen Perpustakaan
+﻿# Requirements: Biblio â€” Sistem Manajemen Perpustakaan
 
 **Defined:** 2026-06-12
-**Core Value:** A mahasiswa can find a book and request to borrow it, a pustakawan can approve/hand it over, and the system tracks the loan through to return — automatically calculating fines on late returns.
+**Core Value:** A mahasiswa can find a book and request to borrow it, a pustakawan can approve/hand it over, and the system tracks the loan through to return â€” automatically calculating fines on late returns.
 
 ## v1 Requirements
 
@@ -14,23 +14,23 @@
 
 ### Catalog
 
-- [ ] **CAT-01**: Mahasiswa can search the book catalog by `judul`, `penulis`, or `isbn`
-- [ ] **CAT-02**: Mahasiswa can filter the catalog by `kategori`
-- [ ] **CAT-03**: Pustakawan can add, edit, and delete master `buku` records
-- [ ] **CAT-04**: Pustakawan can add physical `salinan_buku` copies with `lokasi_rak`, `kondisi`, and `status_ketersediaan`
+- [x] **CAT-01**: Mahasiswa can search the book catalog by `judul`, `penulis`, or `isbn`
+- [x] **CAT-02**: Mahasiswa can filter the catalog by `kategori`
+- [x] **CAT-03**: Pustakawan can add, edit, and delete master `buku` records
+- [x] **CAT-04**: Pustakawan can add physical `salinan_buku` copies with `lokasi_rak`, `kondisi`, and `status_ketersediaan`
 
 ### Loan Requests & Approval
 
-- [ ] **LOAN-01**: Mahasiswa can request to borrow an available book copy (`status_peminjaman` → `menunggu_persetujuan`)
+- [ ] **LOAN-01**: Mahasiswa can request to borrow an available book copy (`status_peminjaman` â†’ `menunggu_persetujuan`)
 - [ ] **LOAN-02**: System rejects a loan request if the mahasiswa already has 5 active loans
 - [ ] **LOAN-03**: System rejects a loan request if `pengguna.is_diblokir = TRUE`
-- [ ] **LOAN-04**: Pustakawan can approve (→ `siap_diambil`) or reject (→ `ditolak`) a pending request, syncing `salinan_buku.status_ketersediaan`
+- [ ] **LOAN-04**: Pustakawan can approve (â†’ `siap_diambil`) or reject (â†’ `ditolak`) a pending request, syncing `salinan_buku.status_ketersediaan`
 - [ ] **LOAN-05**: Approval starts a 2x24h pickup window; if not picked up in time, status auto-becomes `dibatalkan`
-- [ ] **LOAN-06**: Pustakawan can mark a book as physically handed over (→ `dipinjam`), starting the 14-day due date (`tanggal_tenggat`)
+- [ ] **LOAN-06**: Pustakawan can mark a book as physically handed over (â†’ `dipinjam`), starting the 14-day due date (`tanggal_tenggat`)
 
 ### Returns & Fines
 
-- [ ] **RET-01**: Pustakawan can process a return (→ `dikembalikan`), comparing `tanggal_kembali` to `tanggal_tenggat`
+- [ ] **RET-01**: Pustakawan can process a return (â†’ `dikembalikan`), comparing `tanggal_kembali` to `tanggal_tenggat`
 - [ ] **RET-02**: Late returns set `is_diblokir = TRUE` and calculate `total_denda` at Rp 1.000/day overdue
 - [ ] **RET-03**: A late return triggers an overdue-notification via the notification service (Brevo call stubbed/logged in v1)
 - [ ] **RET-04**: Pustakawan can mark a fine as paid ("Denda Lunas"), clearing `is_diblokir`
@@ -80,10 +80,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-02 | Phase 1 | ✅ Complete |
 | AUTH-03 | Phase 1 | ✅ Complete |
 | AUTH-04 | Phase 1 | ✅ Complete |
-| CAT-01 | Phase 2 | Pending |
-| CAT-02 | Phase 2 | Pending |
-| CAT-03 | Phase 2 | Pending |
-| CAT-04 | Phase 2 | Pending |
+| CAT-01 | Phase 2 | ✅ Complete |
+| CAT-02 | Phase 2 | ✅ Complete |
+| CAT-03 | Phase 2 | ✅ Complete |
+| CAT-04 | Phase 2 | ✅ Complete |
 | LOAN-01 | Phase 3 | Pending |
 | LOAN-02 | Phase 3 | Pending |
 | LOAN-03 | Phase 3 | Pending |
@@ -104,8 +104,3 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Coverage:**
 - v1 requirements: 24 total
 - Mapped to phases: 24
-- Unmapped: 0 ✓
-
----
-*Requirements defined: 2026-06-12*
-*Last updated: 2026-06-12 after roadmap creation*
