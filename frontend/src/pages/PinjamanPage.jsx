@@ -104,8 +104,11 @@ export default function PinjamanPage() {
   const [error, setError] = useState('');
   const [toast, setToast] = useState(null);
 
-  // Confirm dialog state (pustakawan actions — wired in Plan 03-03)
+  // Confirm dialog state (pustakawan actions)
   const [confirm, setConfirm] = useState(null);
+
+  // Refresh trigger for re-fetching after actions
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const fetchLoans = useCallback(async () => {
     setLoading(true);
@@ -123,7 +126,86 @@ export default function PinjamanPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchLoans();
-  }, [fetchLoans]);
+  }, [fetchLoans, refreshKey]);
+
+  /* ── Pustakawan action helpers ── */
+
+  function showConfirm({ title, message, confirmLabel, destructive, onConfirm }) {
+    setConfirm({ title, message, confirmLabel, destructive, onConfirm, loading: false });
+  }
+
+  function setConfirmLoading(loading) {
+    setConfirm((prev) => (prev ? { ...prev, loading } : prev));
+  }
+
+  async function handleApprove(item) {
+    showConfirm({
+      title: 'Setujui Pengajuan?',
+      message: `Pengajuan peminjaman "${item.judul}" oleh ${item.nama_mahasiswa} akan disetujui. Mahasiswa memiliki waktu 2x24 jam untuk mengambil buku.`,
+      confirmLabel: 'Setujui',
+      destructive: false,
+      onConfirm: async () => {
+        setConfirmLoading(true);
+        try {
+          await api.put(`/peminjaman/${item.id}/persetujuan`, { aksi: 'setujui' });
+          setConfirm(null);
+          setToast({ type: 'success', message: `Pengajuan disetujui. ${item.nama_mahasiswa} dapat mengambil buku dalam 2x24 jam.` });
+          setRefreshKey((k) => k + 1);
+        } catch {
+          setConfirm(null);
+          setToast({ type: 'error', message: 'Gagal memproses tindakan. Silakan coba lagi.' });
+        }
+      },
+    });
+  }
+
+  async function handleReject(item) {
+    showConfirm({
+      title: 'Tolak Pengajuan?',
+      message: `Pengajuan peminjaman "${item.judul}" oleh ${item.nama_mahasiswa} akan ditolak. Tindakan ini tidak dapat dibatalkan.`,
+      confirmLabel: 'Tolak',
+      destructive: true,
+      onConfirm: async () => {
+        setConfirmLoading(true);
+        try {
+          await api.put(`/peminjaman/${item.id}/persetujuan`, { aksi: 'tolak' });
+          setConfirm(null);
+          setToast({ type: 'success', message: 'Pengajuan ditolak.' });
+          setRefreshKey((k) => k + 1);
+        } catch {
+          setConfirm(null);
+          setToast({ type: 'error', message: 'Gagal memproses tindakan. Silakan coba lagi.' });
+        }
+      },
+    });
+  }
+
+  async function handleHandover(item) {
+    const tenggat = new Date();
+    tenggat.setDate(tenggat.getDate() + 14);
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const formatted = `${tenggat.getDate()} ${months[tenggat.getMonth()]} ${tenggat.getFullYear()}`;
+
+    showConfirm({
+      title: 'Tandai Sudah Diserahkan?',
+      message: `Buku "${item.judul}" akan ditandai sebagai diserahkan kepada ${item.nama_mahasiswa}. Tenggat pengembalian akan diatur ke 14 hari dari sekarang (${formatted}).`,
+      confirmLabel: 'Serahkan',
+      destructive: false,
+      onConfirm: async () => {
+        setConfirmLoading(true);
+        try {
+          await api.put(`/peminjaman/${item.id}/serahkan`);
+          setConfirm(null);
+          setToast({ type: 'success', message: `Buku berhasil diserahkan. Tenggat pengembalian: ${formatted}.` });
+          setRefreshKey((k) => k + 1);
+        } catch {
+          setConfirm(null);
+          setToast({ type: 'error', message: 'Gagal memproses tindakan. Silakan coba lagi.' });
+        }
+      },
+    });
+  }
 
   /* ── Book cell (reused in both tables) ── */
   function BookCell({ item }) {
@@ -358,7 +440,24 @@ export default function PinjamanPage() {
                         </td>
                         <td className="py-3 px-6">
                           <div className="flex gap-2">
-                            {/* Wired in Plan 03-03 */}
+                            <button
+                              type="button"
+                              onClick={() => handleApprove(item)}
+                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-label-sm font-label-sm text-white bg-sage-green hover:opacity-90 transition-opacity min-h-[44px]"
+                              aria-label={`Setujui pengajuan ${item.judul}`}
+                            >
+                              <span className="material-symbols-outlined text-[18px]">check</span>
+                              Setujui
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleReject(item)}
+                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-label-sm font-label-sm text-outline border border-outline hover:bg-surface-container transition-colors min-h-[44px]"
+                              aria-label={`Tolak pengajuan ${item.judul}`}
+                            >
+                              <span className="material-symbols-outlined text-[18px]">close</span>
+                              Tolak
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -448,7 +547,15 @@ export default function PinjamanPage() {
                           </td>
                           <td className="py-3 px-6">
                             <div className="flex gap-2">
-                              {/* Wired in Plan 03-03 */}
+                              <button
+                                type="button"
+                                onClick={() => handleHandover(item)}
+                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-label-sm font-label-sm text-white bg-ink-blue hover:opacity-90 transition-opacity min-h-[44px]"
+                                aria-label={`Serahkan buku ${item.judul}`}
+                              >
+                                <span className="material-symbols-outlined text-[18px]">inventory_2</span>
+                                Serahkan
+                              </button>
                             </div>
                           </td>
                         </tr>
