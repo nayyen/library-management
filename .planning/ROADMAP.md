@@ -103,12 +103,15 @@ Plans:
 **Plans**: 3 plans
 
 **Wave 1**
+
 - [x] 03-01-PLAN.md â Backend peminjaman API: schemas + router + RED/GREEN tests (17 tests, LOAN-01 through LOAN-06)
 
 **Wave 2** *(blocked on Wave 1)*
+
 - [x] 03-02-PLAN.md â Mahasiswa loan-request UI: StatusBadge, BlockedBanner, LoanRequestModal, wired Pinjam on catalog detail, PinjamanPage mahasiswa view
 
 **Wave 3** *(blocked on Wave 2)*
+
 - [x] 03-03-PLAN.md â Pustakawan queue UI: approve/reject/handover actions with ConfirmDialog on PinjamanPage
 
 **UI hint**: yes
@@ -126,11 +129,19 @@ Plans:
   3. A late return produces a logged overdue-notification entry (stubbed Brevo call) that a pustakawan or developer can inspect
   4. A pustakawan can mark a fine as paid via a "Denda Lunas" action, which clears `is_diblokir` on the mahasiswa's account
 
-**Plans**: 3 plans
-Plans:
+**Plans**: 3 plansPlans:
+**Wave 1**
+
 - [ ] 04-01-PLAN.md — Return slice: kembalikan endpoint + fine/block/Brevo log + Sedang Dipinjam section (RET-01, RET-02, RET-03)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 04-02-PLAN.md — Unblock slice: lunasi_denda endpoint + Anggota Diblokir section (RET-04)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 04-03-PLAN.md — Mahasiswa visibility slice: Denda column, Terlambat badge, personalized BlockedBanner (RET-02)
+
 **UI hint**: yes
 
 ### Phase 5: Dashboard, Members & Loan History
