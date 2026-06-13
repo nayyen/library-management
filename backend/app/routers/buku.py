@@ -1,16 +1,17 @@
-"""Book catalog router — read endpoints (CAT-01, CAT-02)."""
+"""Book catalog router — read + write endpoints (CAT-01 through CAT-04)."""
 
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, or_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.dependencies.auth import get_current_user
 from app.models.buku import Buku
 from app.models.salinan_buku import SalinanBuku
-from app.models.enums import StatusSalinan
+from app.models.enums import PeranPengguna, KondisiBuku, StatusSalinan
 from app.schemas.buku import (
     BukuCreate,
     BukuUpdate,
@@ -132,4 +133,182 @@ def detail_buku(
             )
             for s in salinan_list
         ],
+    )
+
+
+def _pustakawan_only(user) -> None:
+    """Helper: raise 403 if user is not a pustakawan."""
+    if user.peran != PeranPengguna.pustakawan:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Akses ditolak.",
+        )
+
+
+@router.post("", response_model=BukuOut, status_code=201)
+def tambah_buku(
+    body: BukuCreate,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+) -> BukuOut:
+    """Create a new master buku record (pustakawan only)."""
+    _pustakawan_only(user)
+
+    # Pre-check duplicate ISBN
+    existing = db.query(Buku).filter(Buku.isbn == body.isbn).first()
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="ISBN ini sudah terdaftar pada buku lain.",
+        )
+
+    buku = Buku(
+        judul=body.judul,
+        penulis=body.penulis,
+        isbn=body.isbn,
+        kategori=body.kategori,
+        tahun_terbit=body.tahun_terbit,
+    )
+    db.add(buku)
+    try:
+        db.commit()
+        db.refresh(buku)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="ISBN ini sudah terdaftar pada buku lain.",
+        )
+
+    return BukuOut(
+        id=str(buku.id),
+        judul=buku.judul,
+        penulis=buku.penulis,
+        isbn=buku.isbn,
+        kategori=buku.kategori,
+        tahun_terbit=buku.tahun_terbit,
+    )
+
+
+@router.put("/{id_buku}", response_model=BukuOut)
+def ubah_buku(
+    id_buku: uuid.UUID,
+    body: BukuUpdate,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+) -> BukuOut:
+    """Update a master buku record (pustakawan only)."""
+    _pustakawan_only(user)
+
+    buku = db.query(Buku).filter(Buku.id == id_buku).first()
+    if not buku:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Buku tidak ditemukan.",
+        )
+
+    # Update only provided fields
+    update_data = body.model_dump(exclude_unset=True)
+    if "isbn" in update_data:
+        # Check duplicate ISBN if changing ISBN
+        existing = (
+            db.query(Buku)
+            .filter(Buku.isbn == body.isbn, Buku.id != id_buku)
+            .first()
+        )
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="ISBN ini sudah terdaftar pada buku lain.",
+            )
+
+    for field, value in update_data.items():
+        setattr(buku, field, value)
+
+    try:
+        db.commit()
+        db.refresh(buku)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="ISBN ini sudah terdaftar pada buku lain.",
+        )
+
+    return BukuOut(
+        id=str(buku.id),
+        judul=buku.judul,
+        penulis=buku.penulis,
+        isbn=buku.isbn,
+        kategori=buku.kategori,
+        tahun_terbit=buku.tahun_terbit,
+    )
+
+
+@router.delete("/{id_buku}", status_code=204)
+def hapus_buku(
+    id_buku: uuid.UUID,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+) -> None:
+    """Delete a master buku record (pustakawan only, FK-safe).
+
+    Blocks deletion if the book has physical copies (409).
+    """
+    _pustakawan_only(user)
+
+    buku = db.query(Buku).filter(Buku.id == id_buku).first()
+    if not buku:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Buku tidak ditemukan.",
+        )
+
+    jumlah_salinan = (
+        db.query(SalinanBuku)
+        .filter(SalinanBuku.id_buku == id_buku)
+        .count()
+    )
+    if jumlah_salinan > 0:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Buku masih memiliki {jumlah_salinan} salinan fisik.",
+        )
+
+    db.delete(buku)
+    db.commit()
+
+
+@router.post("/{id_buku}/salinan", response_model=SalinanBukuOut, status_code=201)
+def tambah_salinan(
+    id_buku: uuid.UUID,
+    body: SalinanBukuCreate,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+) -> SalinanBukuOut:
+    """Add a physical salinan_buku copy (pustakawan only, add-only per D-04)."""
+    _pustakawan_only(user)
+
+    buku = db.query(Buku).filter(Buku.id == id_buku).first()
+    if not buku:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Buku tidak ditemukan.",
+        )
+
+    salinan = SalinanBuku(
+        id_buku=buku.id,
+        lokasi_rak=body.lokasi_rak,
+        kondisi=KondisiBuku(body.kondisi),
+        status_ketersediaan=StatusSalinan(body.status_ketersediaan),
+    )
+    db.add(salinan)
+    db.commit()
+    db.refresh(salinan)
+
+    return SalinanBukuOut(
+        id=str(salinan.id),
+        lokasi_rak=salinan.lokasi_rak,
+        kondisi=salinan.kondisi.value,
+        status_ketersediaan=salinan.status_ketersediaan.value,
     )

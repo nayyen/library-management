@@ -282,3 +282,306 @@ def test_list_buku_unauthorized(client: TestClient) -> None:
     assert resp.status_code == 401, (
         f"Expected 401, got {resp.status_code}: {resp.text}"
     )
+
+
+# ─── CRUD / Role-gate / FK-safe tests (CAT-03, CAT-04) ───
+
+
+def _create_pustakawan_token(client: TestClient, db_session: Session) -> str:
+    """Helper: seed a pustakawan directly and return a Bearer token."""
+    from app.core.security import hash_password
+    from app.models.pengguna import Pengguna
+    from app.models.enums import PeranPengguna
+
+    pustakawan = Pengguna(
+        nama="Pustakawan Test",
+        email="pustakawan_test@biblio.ac.id",
+        kata_sandi=hash_password("admin123"),
+        peran=PeranPengguna.pustakawan,
+    )
+    db_session.add(pustakawan)
+    db_session.commit()
+
+    resp = client.post(
+        "/api/autentikasi/masuk",
+        json={
+            "email": "pustakawan_test@biblio.ac.id",
+            "kata_sandi": "admin123",
+        },
+    )
+    return resp.json()["access_token"]
+
+
+def test_create_buku_pustakawan(
+    client: TestClient, db_session: Session
+) -> None:
+    """POST /api/buku as pustakawan returns 201 with created book."""
+    token = _create_pustakawan_token(client, db_session)
+
+    resp = client.post(
+        "/api/buku",
+        json={
+            "judul": "Buku Baru",
+            "penulis": "Penulis Baru",
+            "isbn": "9781234567890",
+            "kategori": "Fiksi",
+            "tahun_terbit": 2023,
+        },
+        headers=_auth_header(token),
+    )
+    assert resp.status_code == 201, (
+        f"Expected 201, got {resp.status_code}: {resp.text}"
+    )
+    data = resp.json()
+    assert data["judul"] == "Buku Baru"
+    assert data["isbn"] == "9781234567890"
+
+    # Verify it's retrievable
+    list_resp = client.get("/api/buku", headers=_auth_header(token))
+    assert len(list_resp.json()["items"]) >= 1
+
+
+def test_create_buku_forbidden_for_mahasiswa(client: TestClient) -> None:
+    """POST /api/buku as mahasiswa returns 403."""
+    token = _register_and_login(client, "mahasiswa@test.com")
+
+    resp = client.post(
+        "/api/buku",
+        json={
+            "judul": "Hacked Book",
+            "penulis": "Hacker",
+            "isbn": "9789999999999",
+            "kategori": "Fiksi",
+            "tahun_terbit": 2023,
+        },
+        headers=_auth_header(token),
+    )
+    assert resp.status_code == 403, (
+        f"Expected 403, got {resp.status_code}: {resp.text}"
+    )
+
+
+def test_create_buku_duplicate_isbn(
+    client: TestClient, db_session: Session
+) -> None:
+    """POST /api/buku with duplicate ISBN returns 409."""
+    token = _create_pustakawan_token(client, db_session)
+
+    # Create first book
+    resp1 = client.post(
+        "/api/buku",
+        json={
+            "judul": "Buku Pertama",
+            "penulis": "Penulis",
+            "isbn": "9781111111111",
+            "kategori": "Fiksi",
+            "tahun_terbit": 2023,
+        },
+        headers=_auth_header(token),
+    )
+    assert resp1.status_code == 201
+
+    # Try duplicate ISBN
+    resp2 = client.post(
+        "/api/buku",
+        json={
+            "judul": "Buku Duplikat",
+            "penulis": "Penulis Lain",
+            "isbn": "9781111111111",
+            "kategori": "Non-Fiksi",
+            "tahun_terbit": 2022,
+        },
+        headers=_auth_header(token),
+    )
+    assert resp2.status_code == 409, (
+        f"Expected 409 for duplicate ISBN, got {resp2.status_code}: {resp2.text}"
+    )
+    assert "ISBN" in resp2.json()["detail"]
+
+
+def test_edit_buku(client: TestClient, db_session: Session) -> None:
+    """PUT /api/buku/{id} as pustakawan updates the book."""
+    token = _create_pustakawan_token(client, db_session)
+
+    # Create a book first
+    create_resp = client.post(
+        "/api/buku",
+        json={
+            "judul": "Judul Lama",
+            "penulis": "Penulis",
+            "isbn": "9782222222222",
+            "kategori": "Fiksi",
+            "tahun_terbit": 2020,
+        },
+        headers=_auth_header(token),
+    )
+    book_id = create_resp.json()["id"]
+
+    # Edit it
+    edit_resp = client.put(
+        f"/api/buku/{book_id}",
+        json={"judul": "Judul Baru"},
+        headers=_auth_header(token),
+    )
+    assert edit_resp.status_code == 200, (
+        f"Expected 200, got {edit_resp.status_code}: {edit_resp.text}"
+    )
+    assert edit_resp.json()["judul"] == "Judul Baru"
+
+    # Unknown ID → 404
+    unknown_id = uuid.uuid4()
+    not_found = client.put(
+        f"/api/buku/{unknown_id}",
+        json={"judul": "Nope"},
+        headers=_auth_header(token),
+    )
+    assert not_found.status_code == 404
+
+
+def test_delete_buku_no_salinan(
+    client: TestClient, db_session: Session
+) -> None:
+    """DELETE /api/buku/{id} with no copies returns 204."""
+    token = _create_pustakawan_token(client, db_session)
+
+    create_resp = client.post(
+        "/api/buku",
+        json={
+            "judul": "To Delete",
+            "penulis": "Penulis",
+            "isbn": "9783333333333",
+            "kategori": "Fiksi",
+            "tahun_terbit": 2020,
+        },
+        headers=_auth_header(token),
+    )
+    book_id = create_resp.json()["id"]
+
+    del_resp = client.delete(
+        f"/api/buku/{book_id}", headers=_auth_header(token)
+    )
+    assert del_resp.status_code == 204, (
+        f"Expected 204, got {del_resp.status_code}: {del_resp.text}"
+    )
+
+
+def test_delete_buku_with_salinan_blocked(
+    client: TestClient, db_session: Session
+) -> None:
+    """DELETE /api/buku/{id} with copies returns 409."""
+    token = _create_pustakawan_token(client, db_session)
+
+    # Create a book with a copy
+    create_resp = client.post(
+        "/api/buku",
+        json={
+            "judul": "Buku Dengan Salinan",
+            "penulis": "Penulis",
+            "isbn": "9784444444444",
+            "kategori": "Referensi",
+            "tahun_terbit": 2020,
+        },
+        headers=_auth_header(token),
+    )
+    book_id = create_resp.json()["id"]
+
+    # Add a copy
+    client.post(
+        f"/api/buku/{book_id}/salinan",
+        json={
+            "lokasi_rak": "Z-1",
+            "kondisi": "bagus",
+            "status_ketersediaan": "tersedia",
+        },
+        headers=_auth_header(token),
+    )
+
+    # Try to delete
+    del_resp = client.delete(
+        f"/api/buku/{book_id}", headers=_auth_header(token)
+    )
+    assert del_resp.status_code == 409, (
+        f"Expected 409, got {del_resp.status_code}: {del_resp.text}"
+    )
+    assert "salinan" in del_resp.json()["detail"]
+
+    # Verify book still exists
+    get_resp = client.get(
+        f"/api/buku/{book_id}", headers=_auth_header(token)
+    )
+    assert get_resp.status_code == 200
+
+
+def test_add_salinan(client: TestClient, db_session: Session) -> None:
+    """POST /api/buku/{id}/salinan as pustakawan adds a copy."""
+    token = _create_pustakawan_token(client, db_session)
+
+    # Create a book
+    create_resp = client.post(
+        "/api/buku",
+        json={
+            "judul": "Buku Induk",
+            "penulis": "Penulis",
+            "isbn": "9785555555555",
+            "kategori": "Fiksi",
+            "tahun_terbit": 2020,
+        },
+        headers=_auth_header(token),
+    )
+    book_id = create_resp.json()["id"]
+
+    # Add salinan
+    salinan_resp = client.post(
+        f"/api/buku/{book_id}/salinan",
+        json={
+            "lokasi_rak": "A-10",
+            "kondisi": "bagus",
+            "status_ketersediaan": "tersedia",
+        },
+        headers=_auth_header(token),
+    )
+    assert salinan_resp.status_code == 201, (
+        f"Expected 201, got {salinan_resp.status_code}: {salinan_resp.text}"
+    )
+    salinan_data = salinan_resp.json()
+    assert salinan_data["lokasi_rak"] == "A-10"
+
+    # Verify it appears in detail view
+    detail_resp = client.get(
+        f"/api/buku/{book_id}", headers=_auth_header(token)
+    )
+    assert len(detail_resp.json()["salinan"]) == 1
+
+
+def test_add_salinan_forbidden_for_mahasiswa(
+    client: TestClient, db_session: Session
+) -> None:
+    """POST /api/buku/{id}/salinan as mahasiswa returns 403."""
+    # Create a book directly
+    buku = Buku(
+        judul="Protected Book",
+        penulis="Author",
+        isbn="9786666666666",
+        kategori="Fiksi",
+        tahun_terbit=2020,
+    )
+    db_session.add(buku)
+    db_session.commit()
+
+    # Get mahasiswa token
+    mahasiswa_token = _register_and_login(client, "student@test.com")
+
+    # Try to add salinan → 403
+    resp = client.post(
+        f"/api/buku/{buku.id}/salinan",
+        json={
+            "lokasi_rak": "Z-9",
+            "kondisi": "bagus",
+            "status_ketersediaan": "tersedia",
+        },
+        headers=_auth_header(mahasiswa_token),
+    )
+    assert resp.status_code == 403, (
+        f"Expected 403, got {resp.status_code}: {resp.text}"
+    )
+
