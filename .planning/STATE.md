@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 4 context gathered
-last_updated: "2026-06-13T18:44:03.075Z"
+stopped_at: Phase 4 UI-SPEC approved
+last_updated: "2026-06-13T18:56:17.809Z"
 last_activity: "2026-06-13 — Phase 3 shipped — PR #3"
 progress:
   total_phases: 5
@@ -91,6 +91,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-13T18:44:02.996Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-returns-fines-blocking/04-CONTEXT.md
+Last session: 2026-06-13T18:56:17.732Z
+Stopped at: Phase 4 UI-SPEC approved
+Resume file: .planning/phases/04-returns-fines-blocking/04-UI-SPEC.md
