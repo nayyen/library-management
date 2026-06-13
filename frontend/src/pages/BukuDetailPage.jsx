@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router';
 import api from '../lib/api';
 import { getToken, decodeToken } from '../lib/auth';
@@ -7,6 +7,9 @@ import AvailabilityBadge from '../components/AvailabilityBadge';
 import SalinanTable from '../components/SalinanTable';
 import BookFormModal from '../components/BookFormModal';
 import TambahSalinanForm from '../components/TambahSalinanForm';
+import BlockedBanner from '../components/BlockedBanner';
+import LoanRequestModal from '../components/LoanRequestModal';
+import Toast from '../components/Toast';
 
 export default function BukuDetailPage() {
   const { id } = useParams();
@@ -18,11 +21,43 @@ export default function BukuDetailPage() {
   const token = getToken();
   const decoded = token ? decodeToken(token) : null;
   const peran = decoded?.peran ?? 'mahasiswa';
+  const user = decoded
+    ? { id: decoded.sub, nama: decoded.nama, peran: decoded.peran }
+    : null;
 
   // Edit modal
   const [showEditModal, setShowEditModal] = useState(false);
   const [categories, setCategories] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Loan request
+  const [showLoanModal, setShowLoanModal] = useState(false);
+  const [selectedSalinan, setSelectedSalinan] = useState(null);
+  const [loanInfo, setLoanInfo] = useState({ is_diblokir: false, active_count: 0 });
+  const [toast, setToast] = useState(null);
+
+  // Fetch peminjaman info (blocked status + active loan count)
+  const fetchLoanInfo = useCallback(async () => {
+    if (peran !== 'mahasiswa') return;
+    try {
+      const res = await api.get('/peminjaman');
+      const data = res.data;
+      const active = (data.items ?? []).filter(
+        (item) =>
+          item.status_peminjaman === 'menunggu_persetujuan' ||
+          item.status_peminjaman === 'siap_diambil' ||
+          item.status_peminjaman === 'dipinjam',
+      ).length;
+      setLoanInfo({ is_diblokir: !!data.is_diblokir, active_count: active });
+    } catch {
+      // Non-blocking — default to no block
+    }
+  }, [peran]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchLoanInfo();
+  }, [fetchLoanInfo, refreshKey]);
 
   // Fetch categories once for edit modal datalist
   useEffect(() => {
@@ -174,13 +209,34 @@ export default function BukuDetailPage() {
         </div>
       </div>
 
+      {/* Blocked banner (mahasiswa only) */}
+      {peran === 'mahasiswa' && (
+        <BlockedBanner
+          variant={
+            loanInfo.is_diblokir
+              ? 'blocked'
+              : loanInfo.active_count >= 5
+                ? 'limit'
+                : null
+          }
+        />
+      )}
+
       {/* Copies section */}
       <section className="bg-surface-container-low rounded-xl p-6">
         <h2 className="text-headline-sm font-headline-sm text-primary mb-4 flex items-center gap-2">
           <span className="material-symbols-outlined text-[22px] text-outline">content_copy</span>
           Salinan Buku
         </h2>
-        <SalinanTable salinan={buku.salinan} />
+        <SalinanTable
+          salinan={buku.salinan}
+          peran={peran}
+          onPinjam={(salinan) => {
+            setSelectedSalinan(salinan);
+            setShowLoanModal(true);
+          }}
+          pinjamDisabled={loanInfo.is_diblokir || loanInfo.active_count >= 5}
+        />
       </section>
 
       {/* Pustakawan: Tambah Salinan form */}
@@ -209,6 +265,36 @@ export default function BukuDetailPage() {
             setShowEditModal(false);
             setRefreshKey((k) => k + 1);
           }}
+        />
+      )}
+
+      {/* Mahasiswa: Loan Request modal */}
+      {showLoanModal && selectedSalinan && (
+        <LoanRequestModal
+          buku={buku}
+          salinan={selectedSalinan}
+          user={user}
+          onClose={() => {
+            setShowLoanModal(false);
+            setSelectedSalinan(null);
+          }}
+          onSuccess={() => {
+            setToast({
+              type: 'success',
+              message:
+                'Pengajuan peminjaman berhasil dikirim. Menunggu persetujuan pustakawan.',
+            });
+            setRefreshKey((k) => k + 1);
+          }}
+        />
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
         />
       )}
     </div>
