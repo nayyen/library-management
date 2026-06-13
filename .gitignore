@@ -10,3 +10,5 @@ dist/
 
 # Node
 node_modules/
+# Database
+backend/test.db

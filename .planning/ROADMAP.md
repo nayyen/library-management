@@ -14,7 +14,7 @@ Biblio replaces a manual spreadsheet-based library process with a FastAPI + Reac
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation, Schema & Auth** - Scaffolding, docker-compose, full DB schema, and working registration/login with JWT
-- [ ] **Phase 2: Book Catalog** - Mahasiswa can search/filter books; pustakawan can manage master books and physical copies
+- [x] **Phase 2: Book Catalog** - Mahasiswa can search/filter books; pustakawan can manage master books and physical copies
 - [ ] **Phase 3: Loan Request & Approval Workflow** - Mahasiswa can request loans; pustakawan approves/rejects, manages pickup window and handover
 - [ ] **Phase 4: Returns, Fines & Blocking** - Pustakawan processes returns, system calculates fines, blocks accounts, logs overdue notifications, and clears fines
 - [ ] **Phase 5: Dashboard, Members & Loan History** - Pustakawan dashboard with stats/queues, member management, and mahasiswa loan history view
@@ -67,7 +67,23 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A logged-in pustakawan can add, edit, and delete a master `buku` record, and the changes are immediately reflected in the catalog view
   4. A pustakawan can add a physical `salinan_buku` copy to a book, specifying `lokasi_rak`, `kondisi`, and `status_ketersediaan`, and the copy appears in that book's detail view
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+
+**Wave 1**
+
+- [x] 02-01-PLAN.md — Backend catalog read API (search/filter/category/detail) + seed + RED/GREEN tests
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [x] 02-02-PLAN.md — Mahasiswa frontend: browse grid, search/filter, detail view + Salinan table
+- [x] 02-03-PLAN.md — Backend pustakawan CRUD (buku create/edit/delete, add salinan) + role-gate/FK tests
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [x] 02-04-PLAN.md — Pustakawan frontend: Kelola tab, add/edit modal, delete confirm, Tambah Salinan form
+
 **UI hint**: yes
 
 ### Phase 3: Loan Request & Approval Workflow

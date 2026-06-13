@@ -3,6 +3,10 @@ import { getToken, clearToken } from './auth';
 
 const api = axios.create({
   baseURL: '/api',
+  // Serialize array params as ?kategori=A&kategori=B (not ?kategori[]=A&kategori[]=B)
+  paramsSerializer: {
+    indexes: null,
+  },
 });
 
 // Attach Bearer token to every request

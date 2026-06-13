@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import WelcomePage from './pages/WelcomePage';
 import ComingSoonPage from './pages/ComingSoonPage';
+import KatalogPage from './pages/KatalogPage';
+import BukuDetailPage from './pages/BukuDetailPage';
 
 const router = createBrowserRouter([
   {
@@ -22,7 +24,8 @@ const router = createBrowserRouter([
         element: <AppShell />,
         children: [
           { index: true, element: <WelcomePage /> },
-          { path: 'katalog', element: <ComingSoonPage title="Katalog Buku" /> },
+          { path: 'katalog', element: <KatalogPage /> },
+          { path: 'katalog/:id', element: <BukuDetailPage /> },
           { path: 'pinjaman', element: <ComingSoonPage title="Riwayat Peminjaman" /> },
           { path: 'dashboard', element: <ComingSoonPage title="Dashboard Pustakawan" /> },
           { path: 'anggota', element: <ComingSoonPage title="Manajemen Anggota" /> },

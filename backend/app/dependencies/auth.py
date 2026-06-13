@@ -1,5 +1,7 @@
 """JWT authentication dependency."""
 
+import uuid
+
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -50,7 +52,11 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user = db.query(Pengguna).filter(Pengguna.id == user_id).first()
+    user = (
+        db.query(Pengguna)
+        .filter(Pengguna.id == uuid.UUID(user_id))
+        .first()
+    )
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
