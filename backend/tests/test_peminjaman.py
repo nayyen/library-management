@@ -699,3 +699,470 @@ def test_sweep_expired_pickup(
     assert salinan.status_ketersediaan == StatusSalinan.tersedia, (
         f"Expected tersedia, got {salinan.status_ketersediaan}"
     )
+
+
+# ─── RET-01 / RET-02 / RET-03: Return, Fine, Block, Brevo Log ───
+
+
+def _seed_dipinjam_peminjaman(
+    db_session: Session,
+    user: Pengguna,
+    *,
+    tenggat_offset_days: int,
+) -> tuple[Peminjaman, SalinanBuku]:
+    """Seed a dipinjam peminjaman with tanggal_tenggat offset from now.
+
+    Positive offset = future (on-time), negative = overdue.
+    Returns (peminjaman, salinan).
+    """
+    buku = Buku(
+        judul="Buku Dipinjam",
+        penulis="Penulis",
+        isbn=f"978{uuid.uuid4().hex[:10]}",
+        kategori="Fiksi",
+        tahun_terbit=2023,
+    )
+    db_session.add(buku)
+    db_session.flush()
+    salinan = SalinanBuku(
+        id_buku=buku.id,
+        lokasi_rak="R-1",
+        kondisi=KondisiBuku.bagus,
+        status_ketersediaan=StatusSalinan.dipinjam,
+    )
+    db_session.add(salinan)
+    db_session.flush()
+    now = datetime.now(timezone.utc)
+    peminjaman = Peminjaman(
+        id_pengguna=user.id,
+        id_salinan_buku=salinan.id,
+        status_peminjaman=StatusPeminjaman.dipinjam,
+        tanggal_pinjam=now,
+        tanggal_tenggat=now + timedelta(days=tenggat_offset_days),
+    )
+    db_session.add(peminjaman)
+    db_session.commit()
+    return peminjaman, salinan
+
+
+def test_kembalikan_on_time(
+    client: TestClient, db_session: Session
+) -> None:
+    """Pustakawan returns a dipinjam loan before tenggat → 200, dikembalikan, no fine."""
+    pustakawan_token = _create_pustakawan_token(client, db_session)
+    _ = _register_and_login(client, "mhs_kembali_on_time@test.com")
+    user = db_session.query(Pengguna).filter(Pengguna.email == "mhs_kembali_on_time@test.com").first()
+    peminjaman, salinan = _seed_dipinjam_peminjaman(db_session, user, tenggat_offset_days=7)
+
+    resp = client.put(
+        f"/api/peminjaman/{peminjaman.id}/kembalikan",
+        headers=_auth_header(pustakawan_token),
+    )
+    assert resp.status_code == 200, (
+        f"Expected 200, got {resp.status_code}: {resp.text}"
+    )
+    data = resp.json()
+    assert data["status_peminjaman"] == "dikembalikan", (
+        f"Expected dikembalikan, got {data['status_peminjaman']}"
+    )
+    assert data["tanggal_kembali"] is not None, "tanggal_kembali should be set"
+    assert data["total_denda"] == 0, (
+        f"Expected total_denda=0, got {data['total_denda']}"
+    )
+
+    # Verify pengguna is NOT blocked
+    db_session.refresh(user)
+    assert user.is_diblokir is False, "User should NOT be blocked on on-time return"
+
+    # Verify salinan flipped to tersedia
+    db_session.refresh(salinan)
+    assert salinan.status_ketersediaan == StatusSalinan.tersedia, (
+        f"Salinan should be tersedia, got {salinan.status_ketersediaan}"
+    )
+
+
+def test_kembalikan_late(
+    client: TestClient, db_session: Session
+) -> None:
+    """Pustakawan returns a loan 16 days late → 200, fine=16000, blocked, copy freed."""
+    pustakawan_token = _create_pustakawan_token(client, db_session)
+    _ = _register_and_login(client, "mhs_kembali_late@test.com")
+    user = db_session.query(Pengguna).filter(Pengguna.email == "mhs_kembali_late@test.com").first()
+    peminjaman, salinan = _seed_dipinjam_peminjaman(db_session, user, tenggat_offset_days=-16)
+
+    resp = client.put(
+        f"/api/peminjaman/{peminjaman.id}/kembalikan",
+        headers=_auth_header(pustakawan_token),
+    )
+    assert resp.status_code == 200, (
+        f"Expected 200, got {resp.status_code}: {resp.text}"
+    )
+    data = resp.json()
+    assert data["status_peminjaman"] == "dikembalikan"
+    assert data["total_denda"] == 16000, (
+        f"Expected total_denda=16000 (16*1000), got {data['total_denda']}"
+    )
+
+    # Verify pengguna IS blocked
+    db_session.refresh(user)
+    assert user.is_diblokir is True, "User should be blocked after late return"
+
+    # Verify salinan flipped to tersedia
+    db_session.refresh(salinan)
+    assert salinan.status_ketersediaan == StatusSalinan.tersedia
+
+
+def test_kembalikan_late_logs_brevo(
+    client: TestClient, db_session: Session, caplog
+) -> None:
+    """Late return emits a BREVO_NOTIFICATION log line with correct extras."""
+    import logging
+    caplog.set_level(logging.INFO)
+
+    pustakawan_token = _create_pustakawan_token(client, db_session)
+    _ = _register_and_login(client, "mhs_kembali_brevo@test.com")
+    user = db_session.query(Pengguna).filter(Pengguna.email == "mhs_kembali_brevo@test.com").first()
+    peminjaman, _ = _seed_dipinjam_peminjaman(db_session, user, tenggat_offset_days=-16)
+
+    resp = client.put(
+        f"/api/peminjaman/{peminjaman.id}/kembalikan",
+        headers=_auth_header(pustakawan_token),
+    )
+    assert resp.status_code == 200, f"Expected 200, got {resp.status_code}"
+
+    # Check BREVO_NOTIFICATION was logged
+    brevo_records = [
+        r for r in caplog.records
+        if "BREVO_NOTIFICATION" in getattr(r, "message", "")
+    ]
+    assert len(brevo_records) >= 1, "Expected at least one BREVO_NOTIFICATION log record"
+
+    record = brevo_records[0]
+    msg = getattr(record, "message", "")
+    assert str(peminjaman.id) in msg, "Log should contain id_peminjaman"
+    assert user.email in msg, "Log should contain user email"
+    assert "total_denda=16000" in msg, "Log should contain total_denda=16000"
+    assert "status=Sent" in msg, "Log status should be Sent"
+
+
+def test_kembalikan_invalid_state(
+    client: TestClient, db_session: Session
+) -> None:
+    """PUT kembalikan on a siap_diambil (non-dipinjam) loan → 409."""
+    pustakawan_token = _create_pustakawan_token(client, db_session)
+    _ = _register_and_login(client, "mhs_kembali_invalid@test.com")
+    user = db_session.query(Pengguna).filter(Pengguna.email == "mhs_kembali_invalid@test.com").first()
+    peminjaman, _ = _seed_pending_peminjaman(db_session, user)  # menunggu_persetujuan, not dipinjam
+
+    resp = client.put(
+        f"/api/peminjaman/{peminjaman.id}/kembalikan",
+        headers=_auth_header(pustakawan_token),
+    )
+    assert resp.status_code == 409, (
+        f"Expected 409, got {resp.status_code}: {resp.text}"
+    )
+
+
+def test_kembalikan_404(
+    client: TestClient, db_session: Session
+) -> None:
+    """PUT kembalikan on a random uuid → 404."""
+    token = _create_pustakawan_token(client, db_session)
+    unknown_id = uuid.uuid4()
+    resp = client.put(
+        f"/api/peminjaman/{unknown_id}/kembalikan",
+        headers=_auth_header(token),
+    )
+    assert resp.status_code == 404, (
+        f"Expected 404, got {resp.status_code}: {resp.text}"
+    )
+
+
+def test_kembalikan_forbidden_for_mahasiswa(
+    client: TestClient, db_session: Session
+) -> None:
+    """Mahasiswa token → 403."""
+    token = _register_and_login(client, "mhs_kembali_forbid@test.com")
+    user = db_session.query(Pengguna).filter(Pengguna.email == "mhs_kembali_forbid@test.com").first()
+    peminjaman, _ = _seed_dipinjam_peminjaman(db_session, user, tenggat_offset_days=7)
+
+    resp = client.put(
+        f"/api/peminjaman/{peminjaman.id}/kembalikan",
+        headers=_auth_header(token),
+    )
+    assert resp.status_code == 403, (
+        f"Expected 403, got {resp.status_code}: {resp.text}"
+    )
+
+
+def test_list_pustakawan_sedang_dipinjam(
+    client: TestClient, db_session: Session
+) -> None:
+    """Pustakawan GET /api/peminjaman returns sedang_dipinjam list
+    ordered by tanggal_tenggat ascending, with is_terlambat flag."""
+    pustakawan_token = _create_pustakawan_token(client, db_session)
+
+    # Create two mahasiswa with dipinjam loans
+    # Mahasiswa A: loan due in 5 days (not overdue)
+    token_a = _register_and_login(client, "mhs_sdg_a@test.com")
+    user_a = db_session.query(Pengguna).filter(Pengguna.email == "mhs_sdg_a@test.com").first()
+    _seed_dipinjam_peminjaman(db_session, user_a, tenggat_offset_days=5)
+
+    # Mahasiswa B: loan overdue by 3 days (is_terlambat=True)
+    token_b = _register_and_login(client, "mhs_sdg_b@test.com")
+    user_b = db_session.query(Pengguna).filter(Pengguna.email == "mhs_sdg_b@test.com").first()
+    _seed_dipinjam_peminjaman(db_session, user_b, tenggat_offset_days=-3)
+
+    resp = client.get(
+        "/api/peminjaman",
+        headers=_auth_header(pustakawan_token),
+    )
+    assert resp.status_code == 200, (
+        f"Expected 200, got {resp.status_code}: {resp.text}"
+    )
+    data = resp.json()
+    assert "sedang_dipinjam" in data, (
+        f"Response missing 'sedang_dipinjam': {data}"
+    )
+
+    sd = data["sedang_dipinjam"]
+    assert len(sd) == 2, f"Expected 2 items in sedang_dipinjam, got {len(sd)}"
+
+    # Overdue row should come first (ascending tenggat)
+    assert sd[0]["is_terlambat"] is True, "First should be the overdue row (is_terlambat=True)"
+    assert sd[1]["is_terlambat"] is False, "Second should be the on-time row (is_terlambat=False)"
+
+
+# ─── RET-04: Lunasi Denda (Unblock) ───
+
+
+def test_lunasi_denda_clears_block(
+    client: TestClient, db_session: Session
+) -> None:
+    """Pustakawan clears a member's block via lunasi_denda → 200,
+    is_diblokir becomes False, existing total_denda rows UNCHANGED (D-05)."""
+    pustakawan_token = _create_pustakawan_token(client, db_session)
+    _ = _register_and_login(client, "mhs_unblock@test.com")
+    user = db_session.query(Pengguna).filter(Pengguna.email == "mhs_unblock@test.com").first()
+    user.is_diblokir = True
+
+    # Seed a dikembalikan loan with total_denda = 16000 as historical record
+    buku = Buku(
+        judul="Buku Denda",
+        penulis="Penulis",
+        isbn=f"978{uuid.uuid4().hex[:10]}",
+        kategori="Fiksi",
+        tahun_terbit=2023,
+    )
+    db_session.add(buku)
+    db_session.flush()
+    salinan = SalinanBuku(
+        id_buku=buku.id,
+        lokasi_rak="R-DENDA",
+        kondisi=KondisiBuku.bagus,
+        status_ketersediaan=StatusSalinan.tersedia,
+    )
+    db_session.add(salinan)
+    db_session.flush()
+    peminjaman = Peminjaman(
+        id_pengguna=user.id,
+        id_salinan_buku=salinan.id,
+        status_peminjaman=StatusPeminjaman.dikembalikan,
+        total_denda=16000,
+    )
+    db_session.add(peminjaman)
+    db_session.commit()
+
+    # Sanity check: user is blocked before
+    assert user.is_diblokir is True
+
+    resp = client.put(
+        f"/api/peminjaman/anggota/{user.id}/lunasi_denda",
+        headers=_auth_header(pustakawan_token),
+    )
+    assert resp.status_code == 200, (
+        f"Expected 200, got {resp.status_code}: {resp.text}"
+    )
+
+    # Verify is_diblokir cleared
+    db_session.refresh(user)
+    assert user.is_diblokir is False, (
+        "User should be unblocked after lunasi_denda"
+    )
+
+    # Verify historical denda rows UNCHANGED (D-05)
+    db_session.refresh(peminjaman)
+    assert peminjaman.total_denda == 16000, (
+        f"Historical total_denda should remain 16000, got {peminjaman.total_denda}"
+    )
+
+
+def test_lunasi_denda_forbidden_for_mahasiswa(
+    client: TestClient, db_session: Session
+) -> None:
+    """Mahasiswa token → 403."""
+    token = _register_and_login(client, "mhs_lunasi_forbid@test.com")
+    user = db_session.query(Pengguna).filter(Pengguna.email == "mhs_lunasi_forbid@test.com").first()
+
+    resp = client.put(
+        f"/api/peminjaman/anggota/{user.id}/lunasi_denda",
+        headers=_auth_header(token),
+    )
+    assert resp.status_code == 403, (
+        f"Expected 403, got {resp.status_code}: {resp.text}"
+    )
+
+
+def test_lunasi_denda_404(
+    client: TestClient, db_session: Session
+) -> None:
+    """Random id_pengguna → 404."""
+    token = _create_pustakawan_token(client, db_session)
+    unknown_id = uuid.uuid4()
+
+    resp = client.put(
+        f"/api/peminjaman/anggota/{unknown_id}/lunasi_denda",
+        headers=_auth_header(token),
+    )
+    assert resp.status_code == 404, (
+        f"Expected 404, got {resp.status_code}: {resp.text}"
+    )
+
+
+def test_list_pustakawan_anggota_diblokir(
+    client: TestClient, db_session: Session
+) -> None:
+    """Pustakawan GET /api/peminjaman returns anggota_diblokir list
+    with per-member SUM(total_denda) over dikembalikan loans (D-06)."""
+    pustakawan_token = _create_pustakawan_token(client, db_session)
+
+    # Create a blocked mahasiswa directly
+    blocked_user = Pengguna(
+        nama="Mahasiswa Diblokir",
+        email="mhs_blokir_list@test.com",
+        kata_sandi=hash_password("pass123"),
+        peran=PeranPengguna.mahasiswa,
+        is_diblokir=True,
+    )
+    db_session.add(blocked_user)
+    db_session.flush()
+
+    # Seed 2 dikembalikan loans: 16000 + 4000 = 20000
+    for judul, lokasi, denda in [
+        ("Buku Denda A", "R-A", 16000),
+        ("Buku Denda B", "R-B", 4000),
+    ]:
+        buku = Buku(
+            judul=judul, penulis="Penulis",
+            isbn=f"978{uuid.uuid4().hex[:10]}",
+            kategori="Fiksi", tahun_terbit=2023,
+        )
+        db_session.add(buku)
+        db_session.flush()
+        salinan = SalinanBuku(
+            id_buku=buku.id, lokasi_rak=lokasi,
+            kondisi=KondisiBuku.bagus,
+            status_ketersediaan=StatusSalinan.tersedia,
+        )
+        db_session.add(salinan)
+        db_session.flush()
+        peminjaman = Peminjaman(
+            id_pengguna=blocked_user.id,
+            id_salinan_buku=salinan.id,
+            status_peminjaman=StatusPeminjaman.dikembalikan,
+            total_denda=denda,
+        )
+        db_session.add(peminjaman)
+
+    # Create a non-blocked mahasiswa — should NOT appear in anggota_diblokir
+    free_user = Pengguna(
+        nama="Mahasiswa Bebas",
+        email="mhs_bebas@test.com",
+        kata_sandi=hash_password("pass123"),
+        peran=PeranPengguna.mahasiswa,
+        is_diblokir=False,
+    )
+    db_session.add(free_user)
+    db_session.commit()
+
+    resp = client.get(
+        "/api/peminjaman",
+        headers=_auth_header(pustakawan_token),
+    )
+    assert resp.status_code == 200, (
+        f"Expected 200, got {resp.status_code}: {resp.text}"
+    )
+    data = resp.json()
+    assert "anggota_diblokir" in data, (
+        f"Response missing 'anggota_diblokir': {data}"
+    )
+
+    ad = data["anggota_diblokir"]
+    assert len(ad) == 1, (
+        f"Expected 1 member in anggota_diblokir, got {len(ad)}: {ad}"
+    )
+
+    entry = ad[0]
+    assert entry["id_pengguna"] == str(blocked_user.id), (
+        f"Expected id_pengguna={blocked_user.id}, got {entry['id_pengguna']}"
+    )
+    assert entry["total_denda"] == 20000, (
+        f"Expected total_denda=20000 (16000+4000), got {entry['total_denda']}"
+    )
+    assert entry["email"] == "mhs_blokir_list@test.com"
+    assert entry["nama"] == "Mahasiswa Diblokir"
+
+
+# ─── RET-02 (visibility half): Mahasiswa denda_tertunggak ───
+
+
+def test_list_mahasiswa_denda_tertunggak(
+    client: TestClient, db_session: Session
+) -> None:
+    """Mahasiswa GET /api/peminjaman returns denda_tertunggak = SUM(total_denda)
+    over their own dikembalikan loans.  A member with 5000+0 → 5000."""
+    token = _register_and_login(client, "mhs_denda_sum@test.com")
+    user = db_session.query(Pengguna).filter(Pengguna.email == "mhs_denda_sum@test.com").first()
+
+    # Seed 2 dikembalikan loans: 5000 and 0
+    for i, (judul, lokasi, denda) in enumerate([
+        ("Buku Denda 1", "R-D1", 5000),
+        ("Buku Denda 2", "R-D2", 0),
+    ]):
+        buku = Buku(
+            judul=judul, penulis="Penulis",
+            isbn=f"978{uuid.uuid4().hex[:10]}",
+            kategori="Fiksi", tahun_terbit=2023,
+        )
+        db_session.add(buku)
+        db_session.flush()
+        salinan = SalinanBuku(
+            id_buku=buku.id, lokasi_rak=lokasi,
+            kondisi=KondisiBuku.bagus,
+            status_ketersediaan=StatusSalinan.tersedia,
+        )
+        db_session.add(salinan)
+        db_session.flush()
+        peminjaman = Peminjaman(
+            id_pengguna=user.id,
+            id_salinan_buku=salinan.id,
+            status_peminjaman=StatusPeminjaman.dikembalikan,
+            total_denda=denda,
+        )
+        db_session.add(peminjaman)
+    db_session.commit()
+
+    resp = client.get(
+        "/api/peminjaman",
+        headers=_auth_header(token),
+    )
+    assert resp.status_code == 200, (
+        f"Expected 200, got {resp.status_code}: {resp.text}"
+    )
+    data = resp.json()
+    assert "denda_tertunggak" in data, (
+        f"Response missing 'denda_tertunggak': {data}"
+    )
+    assert data["denda_tertunggak"] == 5000, (
+        f"Expected denda_tertunggak=5000, got {data['denda_tertunggak']}"
+    )

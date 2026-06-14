@@ -29,6 +29,20 @@ class PeminjamanItemOut(BaseModel):
     tanggal_pengajuan: datetime | None = None
     tanggal_siap_ambil: datetime | None = None
     tanggal_tenggat: datetime | None = None
+    tanggal_kembali: datetime | None = None
+    total_denda: int = 0
+    is_terlambat: bool = False
+
+    model_config = {"from_attributes": True}
+
+
+class AnggotaDiblokirOut(BaseModel):
+    """A single blocked member summary, used in the pustakawan aggregate list."""
+
+    id_pengguna: str
+    nama: str
+    email: str
+    total_denda: int
 
     model_config = {"from_attributes": True}
 
@@ -37,14 +51,18 @@ class PeminjamanResponse(BaseModel):
     """Unified GET /api/peminjaman response.
 
     Mahasiswa branch populates ``items`` / ``total`` / ``is_diblokir``.
-    Pustakawan branch populates ``menunggu_persetujuan`` / ``siap_diambil``.
+    Pustakawan branch populates ``menunggu_persetujuan`` / ``siap_diambil`` /
+    ``sedang_dipinjam`` / ``anggota_diblokir``.
     """
 
     items: list[PeminjamanItemOut] | None = None
     total: int | None = None
     is_diblokir: bool | None = None
+    denda_tertunggak: int | None = None
     menunggu_persetujuan: list[PeminjamanItemOut] | None = None
     siap_diambil: list[PeminjamanItemOut] | None = None
+    sedang_dipinjam: list[PeminjamanItemOut] | None = None
+    anggota_diblokir: list[AnggotaDiblokirOut] | None = None
 
 
 class PersetujuanBody(BaseModel):

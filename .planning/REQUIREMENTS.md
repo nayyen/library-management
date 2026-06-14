@@ -91,9 +91,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LOAN-05 | Phase 3 | Pending |
 | LOAN-06 | Phase 3 | Pending |
 | RET-01 | Phase 4 | Pending |
+--- RET-01 covered by PUT /peminjaman/{id}/kembalikan endpoint — records tanggal_kembali and status_peminjaman=dikembalikan
 | RET-02 | Phase 4 | Pending |
+--- RET-02 fine calculation (Rp 1.000/day) + is_diblokir=TRUE on late return
 | RET-03 | Phase 4 | Pending |
+--- RET-03 BREVO_NOTIFICATION stub logged via logger.info — visible in docker-compose logs backend
 | RET-04 | Phase 4 | Pending |
+--- RET-04 Denda Lunas via PUT /peminjaman/anggota/{id}/lunasi_denda — clears is_diblokir
 | DASH-01 | Phase 5 | Pending |
 | DASH-02 | Phase 5 | Pending |
 | DASH-03 | Phase 5 | Pending |

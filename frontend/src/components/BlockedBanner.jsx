@@ -2,7 +2,8 @@
  * BlockedBanner — persistent disable banner (D-04, LOAN-02/LOAN-03).
  *
  * Props:
- *   variant : 'limit' | 'blocked' | null — renders nothing if falsy
+ *   variant     : 'limit' | 'blocked' | null — renders nothing if falsy
+ *   dendaAmount : number — outstanding denda amount for the blocked variant
  */
 
 const variantConfig = {
@@ -15,14 +16,15 @@ const variantConfig = {
   },
   blocked: {
     heading: 'Akun Diblokir',
-    body: 'Akun Anda diblokir karena ada denda yang belum dibayar. Selesaikan pembayaran denda di perpustakaan untuk mengajukan pinjaman baru.',
+    body: (dendaAmount) =>
+      `Akun Anda diblokir karena denda Rp ${dendaAmount.toLocaleString('id-ID')} belum dibayar. Selesaikan pembayaran denda di perpustakaan untuk mengajukan pinjaman baru.`,
     icon: 'block',
     class: 'bg-alert-crimson/10 border-alert-crimson/30 text-alert-crimson',
     iconClass: 'text-alert-crimson',
   },
 };
 
-export default function BlockedBanner({ variant }) {
+export default function BlockedBanner({ variant, dendaAmount }) {
   if (!variant) return null;
 
   const config = variantConfig[variant];
@@ -42,7 +44,11 @@ export default function BlockedBanner({ variant }) {
       </span>
       <div>
         <p className="text-label-md font-label-md">{config.heading}</p>
-        <p className="text-body-lg font-body-lg mt-1">{config.body}</p>
+        <p className="text-body-lg font-body-lg mt-1">
+          {typeof config.body === 'function'
+            ? config.body(dendaAmount ?? 0)
+            : config.body}
+        </p>
       </div>
     </div>
   );

@@ -22,6 +22,11 @@ const variants = {
     class: 'bg-primary-container/10 text-primary-container border-primary-fixed',
     icon: 'inventory_2',
   },
+  terlambat: {
+    label: 'Terlambat',
+    class: 'bg-error-container text-on-error-container border-alert-crimson',
+    icon: 'warning',
+  },
   ditolak: {
     label: 'Ditolak',
     class: 'bg-alert-crimson/10 text-alert-crimson border-alert-crimson/20',
