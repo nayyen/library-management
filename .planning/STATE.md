@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 4 completed — all plans executed
+stopped_at: Phase 4 shipped — PR #4
 last_updated: "2026-06-13T19:13:13.986Z"
 last_activity: "2026-06-13 — Phase 4 completed — 3 plans, 29 tests, 3 frontend waves"
 last_activity: "2026-06-14 — Phase 4 UAT completed — 10/10 tests passed, 1 issue fixed (Brevo logging visibility), 29/29 pytest GREEN, frontend build PASS"
@@ -110,3 +110,4 @@ Items acknowledged and carried forward:
 | Checkpoint | Phase 4 manual UAT — full return→block→unblock→mahasiswa visibility flow | Deferred | 2026-06-13 |
 | Checkpoint | Phase 4 UAT | ✅ Complete — 10/10 tests passed | 2026-06-14 |
 | Branch | Phase 4 built on `phase-3-loan-request-approval-workflow` branch (same as PR #3); new branch recommended before Phase 5 | Deferred | 2026-06-13 |
+| Branch | Phase 4 shipped via PR #4 on new branch `phase-4-returns-fines-blocking` | ✅ Complete | 2026-06-14 |
