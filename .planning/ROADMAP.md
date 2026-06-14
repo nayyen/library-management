@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation, Schema & Auth** - Scaffolding, docker-compose, full DB schema, and working registration/login with JWT
 - [x] **Phase 2: Book Catalog** - Mahasiswa can search/filter books; pustakawan can manage master books and physical copies
 - [x] **Phase 3: Loan Request & Approval Workflow** - Mahasiswa can request loans; pustakawan approves/rejects, manages pickup window and handover
-- [ ] **Phase 4: Returns, Fines & Blocking** - Pustakawan processes returns, system calculates fines, blocks accounts, logs overdue notifications, and clears fines
+- [x] **Phase 4: Returns, Fines & Blocking** - Pustakawan processes returns, system calculates fines, blocks accounts, logs overdue notifications, and clears fines
 - [ ] **Phase 5: Dashboard, Members & Loan History** - Pustakawan dashboard with stats/queues, member management, and mahasiswa loan history view
 
 ## Phase Details
@@ -129,18 +129,18 @@ Plans:
   3. A late return produces a logged overdue-notification entry (stubbed Brevo call) that a pustakawan or developer can inspect
   4. A pustakawan can mark a fine as paid via a "Denda Lunas" action, which clears `is_diblokir` on the mahasiswa's account
 
-**Plans**: 3 plansPlans:
+**Plans**: 3 plans (all completed)
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — Return slice: kembalikan endpoint + fine/block/Brevo log + Sedang Dipinjam section (RET-01, RET-02, RET-03)
+- [x] 04-01-PLAN.md — Return slice: kembalikan endpoint + fine/block/Brevo log + Sedang Dipinjam section + StatusBadge terlambat (RET-01, RET-02, RET-03)
 
-**Wave 2** *(blocked on Wave 1 completion)*
+**Wave 2** *(blocked on Wave 1)*
 
-- [ ] 04-02-PLAN.md — Unblock slice: lunasi_denda endpoint + Anggota Diblokir section (RET-04)
+- [x] 04-02-PLAN.md — Unblock slice: lunasi_denda endpoint + AnggotaDiblokirOut schema + Anggota Diblokir card-list section (RET-04)
 
-**Wave 3** *(blocked on Wave 2 completion)*
+**Wave 3** *(blocked on Wave 2)*
 
-- [ ] 04-03-PLAN.md — Mahasiswa visibility slice: Denda column, Terlambat badge, personalized BlockedBanner (RET-02)
+- [x] 04-03-PLAN.md — Mahasiswa visibility slice: denda_tertunggak aggregate, Denda column, Terlambat badge, personalized BlockedBanner dendaAmount (RET-02)
 
 **UI hint**: yes
 

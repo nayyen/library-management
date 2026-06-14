@@ -1,16 +1,19 @@
-"""Peminjaman (loan) router — LOAN-01 through LOAN-06.
+"""Peminjaman (loan) router — LOAN-01 through LOAN-06, RET-01 through RET-04.
 
 Endpoints:
 - POST /api/peminjaman/ajukan    — Mahasiswa requests a loan
 - GET  /api/peminjaman            — Shared list (role-conditional content)
 - PUT  /api/peminjaman/{id}/persetujuan — Pustakawan approve/reject
 - PUT  /api/peminjaman/{id}/serahkan    — Pustakawan handover
+- PUT  /api/peminjaman/{id}/kembalikan  — Pustakawan process return
 """
 
+import logging
 import uuid
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.database import get_db
@@ -25,6 +28,7 @@ from app.models.enums import (
     StatusSalinan,
 )
 from app.schemas.peminjaman import (
+    AnggotaDiblokirOut,
     PeminjamanAjukan,
     PeminjamanItemOut,
     PeminjamanResponse,
@@ -32,6 +36,9 @@ from app.schemas.peminjaman import (
 )
 
 router = APIRouter(prefix="/api/peminjaman", tags=["peminjaman"])
+
+# Module-level logger for Brevo notification stub (RET-03)
+logger = logging.getLogger(__name__)
 
 # ──────────────────────────────────────────────────────────────────────
 # Constants
@@ -78,12 +85,26 @@ def _active_loan_count(db: Session, id_pengguna: uuid.UUID) -> int:
     )
 
 
+def _is_terlambat(row: Peminjaman, now: datetime) -> bool:
+    """True if a dipinjam loan is past its tanggal_tenggat (D-02/D-08).
+
+    Handles offset-naive tenggat (SQLite) vs offset-aware now (PostgreSQL).
+    """
+    tenggat = row.tanggal_tenggat
+    if tenggat is None:
+        return False
+    if tenggat.tzinfo is None and now.tzinfo is not None:
+        tenggat = tenggat.replace(tzinfo=now.tzinfo)
+    return row.status_peminjaman == StatusPeminjaman.dipinjam and tenggat < now
+
+
 def _build_item_out(row: Peminjaman) -> PeminjamanItemOut:
     """Build a PeminjamanItemOut from a joined peminjaman row.
 
     Expects the row to have eager-loaded relations:
     ``salinan_buku`` → ``buku`` and ``pengguna``.
     """
+    now = datetime.now(timezone.utc)
     return PeminjamanItemOut(
         id=str(row.id),
         status_peminjaman=row.status_peminjaman.value,
@@ -94,6 +115,9 @@ def _build_item_out(row: Peminjaman) -> PeminjamanItemOut:
         tanggal_pengajuan=row.tanggal_pengajuan,
         tanggal_siap_ambil=row.tanggal_siap_ambil,
         tanggal_tenggat=row.tanggal_tenggat,
+        tanggal_kembali=row.tanggal_kembali,
+        total_denda=row.total_denda,
+        is_terlambat=_is_terlambat(row, now),
     )
 
 
@@ -235,12 +259,49 @@ def daftar_peminjaman(
             .order_by(Peminjaman.tanggal_siap_ambil.desc())
             .all()
         ]
+        sedang_dipinjam = [
+            _build_item_out(r)
+            for r in base_query.filter(
+                Peminjaman.status_peminjaman == StatusPeminjaman.dipinjam,
+            )
+            .order_by(Peminjaman.tanggal_tenggat.asc())
+            .all()
+        ]
+
+        # RET-04 / D-06: anggota_diblokir aggregate list
+        blocked_users = (
+            db.query(Pengguna)
+            .filter(Pengguna.is_diblokir == True)
+            .all()
+        )
+        anggota_diblokir = []
+        for u in blocked_users:
+            total = (
+                db.query(func.sum(Peminjaman.total_denda))
+                .filter(
+                    Peminjaman.id_pengguna == u.id,
+                    Peminjaman.status_peminjaman == StatusPeminjaman.dikembalikan,
+                )
+                .scalar()
+                or 0
+            )
+            anggota_diblokir.append(
+                AnggotaDiblokirOut(
+                    id_pengguna=str(u.id),
+                    nama=u.nama,
+                    email=u.email,
+                    total_denda=total,
+                )
+            )
+
         return PeminjamanResponse(
             menunggu_persetujuan=menunggu,
             siap_diambil=siap_diambil,
+            sedang_dipinjam=sedang_dipinjam,
+            anggota_diblokir=anggota_diblokir,
         )
 
-    # Mahasiswa branch: own loans only + is_diblokir flag
+    # Mahasiswa branch: own loans only + is_diblokir flag + denda_tertunggak
     items = [
         _build_item_out(r)
         for r in base_query.filter(
@@ -249,10 +310,20 @@ def daftar_peminjaman(
         .order_by(Peminjaman.tanggal_pengajuan.desc())
         .all()
     ]
+    denda_tertunggak = (
+        db.query(func.sum(Peminjaman.total_denda))
+        .filter(
+            Peminjaman.id_pengguna == user.id,
+            Peminjaman.status_peminjaman == StatusPeminjaman.dikembalikan,
+        )
+        .scalar()
+        or 0
+    )
     return PeminjamanResponse(
         items=items,
         total=len(items),
         is_diblokir=user.is_diblokir,  # LOAN-03 banner data source (D-04)
+        denda_tertunggak=denda_tertunggak,
     )
 
 
@@ -347,3 +418,111 @@ def serahkan_peminjaman(
     db.commit()
     db.refresh(row)
     return _build_item_out(row)
+
+
+@router.put("/{id_peminjaman}/kembalikan", response_model=PeminjamanItemOut)
+def kembalikan_peminjaman(
+    id_peminjaman: uuid.UUID,
+    db: Session = Depends(get_db),
+    user: Pengguna = Depends(get_current_user),
+) -> PeminjamanItemOut:
+    """Pustakawan processes a return for a dipinjam loan (RET-01).
+
+    On late returns: calculates total_denda (Rp 1.000/day), sets
+    pengguna.is_diblokir = True, and logs a stubbed Brevo notification (RET-02/03).
+    The salinan is reset to tersedia regardless of timeliness.
+    """
+    _pustakawan_only(user)
+
+    row = (
+        db.query(Peminjaman)
+        .options(
+            joinedload(Peminjaman.salinan_buku).joinedload(SalinanBuku.buku),
+            joinedload(Peminjaman.pengguna),
+        )
+        .filter(Peminjaman.id == id_peminjaman)
+        .first()
+    )
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Pengajuan peminjaman tidak ditemukan.",
+        )
+
+    if row.status_peminjaman != StatusPeminjaman.dipinjam:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Pinjaman tidak dalam status dipinjam.",
+        )
+
+    now = datetime.now(timezone.utc)
+    row.tanggal_kembali = now
+    row.status_peminjaman = StatusPeminjaman.dikembalikan
+    row.salinan_buku.status_ketersediaan = StatusSalinan.tersedia
+
+    # RET-02: Fine calculation
+    days_late = max(
+        0,
+        (row.tanggal_kembali.date() - row.tanggal_tenggat.date()).days,
+    )
+    if days_late > 0:
+        row.total_denda = days_late * 1000
+        row.pengguna.is_diblokir = True
+        # RET-03: Brevo notification stub
+        logger.info(
+            "BREVO_NOTIFICATION id_peminjaman=%s email=%s total_denda=%s status=Sent",
+            str(row.id),
+            row.pengguna.email,
+            row.total_denda,
+        )
+
+    db.commit()
+    db.refresh(row)
+    return _build_item_out(row)
+
+
+@router.put("/anggota/{id_pengguna}/lunasi_denda", response_model=AnggotaDiblokirOut)
+def lunasi_denda(
+    id_pengguna: uuid.UUID,
+    db: Session = Depends(get_db),
+    user: Pengguna = Depends(get_current_user),
+) -> AnggotaDiblokirOut:
+    """Pustakawan clears a member's block after fine is paid (RET-04).
+
+    Sets is_diblokir = False on the member's account.  Does NOT touch any
+    ``total_denda`` rows (historical record preserved per D-05).
+    """
+    _pustakawan_only(user)
+
+    member = (
+        db.query(Pengguna)
+        .filter(Pengguna.id == id_pengguna)
+        .first()
+    )
+    if not member:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Anggota tidak ditemukan.",
+        )
+
+    member.is_diblokir = False
+    db.commit()
+    db.refresh(member)
+
+    # Recompute the summed denda for the response
+    total = (
+        db.query(func.sum(Peminjaman.total_denda))
+        .filter(
+            Peminjaman.id_pengguna == member.id,
+            Peminjaman.status_peminjaman == StatusPeminjaman.dikembalikan,
+        )
+        .scalar()
+        or 0
+    )
+
+    return AnggotaDiblokirOut(
+        id_pengguna=str(member.id),
+        nama=member.nama,
+        email=member.email,
+        total_denda=total,
+    )
