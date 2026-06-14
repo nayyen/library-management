@@ -12,15 +12,13 @@ The end-to-end loan lifecycle must work correctly: a mahasiswa can find a book a
 
 ### Validated
 
-(None yet — ship to validate)
+**Authentication**
+- [x] User can register as `mahasiswa` with email + password (pustakawan accounts are seeded, not self-registered)
+- [x] User can log in and receive a JWT valid for 1 hour
+- [x] Passwords are hashed with bcrypt
+- [x] Protected endpoints reject requests with missing/expired tokens (401)
 
 ### Active
-
-**Authentication**
-- [ ] User can register as `mahasiswa` with email + password (pustakawan accounts are seeded, not self-registered)
-- [ ] User can log in and receive a JWT valid for 1 hour
-- [ ] Passwords are hashed with bcrypt
-- [ ] Protected endpoints reject requests with missing/expired tokens (401)
 
 **Catalog**
 - [ ] Mahasiswa can search the catalog by `judul`, `penulis`, or `isbn`
