@@ -9,6 +9,7 @@ import ComingSoonPage from './pages/ComingSoonPage';
 import KatalogPage from './pages/KatalogPage';
 import BukuDetailPage from './pages/BukuDetailPage';
 import PinjamanPage from './pages/PinjamanPage';
+import DashboardPage from './pages/DashboardPage';
 
 const router = createBrowserRouter([
   {
@@ -28,7 +29,7 @@ const router = createBrowserRouter([
           { path: 'katalog', element: <KatalogPage /> },
           { path: 'katalog/:id', element: <BukuDetailPage /> },
           { path: 'pinjaman', element: <PinjamanPage /> },
-          { path: 'dashboard', element: <ComingSoonPage title="Dashboard Pustakawan" /> },
+          { path: 'dashboard', element: <DashboardPage /> },
           { path: 'anggota', element: <ComingSoonPage title="Manajemen Anggota" /> },
         ],
       },
