@@ -21,25 +21,25 @@
 
 ### Loan Requests & Approval
 
-- [ ] **LOAN-01**: Mahasiswa can request to borrow an available book copy (`status_peminjaman` â†’ `menunggu_persetujuan`)
-- [ ] **LOAN-02**: System rejects a loan request if the mahasiswa already has 5 active loans
-- [ ] **LOAN-03**: System rejects a loan request if `pengguna.is_diblokir = TRUE`
-- [ ] **LOAN-04**: Pustakawan can approve (â†’ `siap_diambil`) or reject (â†’ `ditolak`) a pending request, syncing `salinan_buku.status_ketersediaan`
-- [ ] **LOAN-05**: Approval starts a 2x24h pickup window; if not picked up in time, status auto-becomes `dibatalkan`
-- [ ] **LOAN-06**: Pustakawan can mark a book as physically handed over (â†’ `dipinjam`), starting the 14-day due date (`tanggal_tenggat`)
+- [x] **LOAN-01**: Mahasiswa can request to borrow an available book copy (`status_peminjaman` â†' `menunggu_persetujuan`)
+- [x] **LOAN-02**: System rejects a loan request if the mahasiswa already has 5 active loans
+- [x] **LOAN-03**: System rejects a loan request if `pengguna.is_diblokir = TRUE`
+- [x] **LOAN-04**: Pustakawan can approve (â†' `siap_diambil`) or reject (â†' `ditolak`) a pending request, syncing `salinan_buku.status_ketersediaan`
+- [x] **LOAN-05**: Approval starts a 2x24h pickup window; if not picked up in time, status auto-becomes `dibatalkan`
+- [x] **LOAN-06**: Pustakawan can mark a book as physically handed over (â†' `dipinjam`), starting the 14-day due date (`tanggal_tenggat`)
 
 ### Returns & Fines
 
-- [ ] **RET-01**: Pustakawan can process a return (â†’ `dikembalikan`), comparing `tanggal_kembali` to `tanggal_tenggat`
-- [ ] **RET-02**: Late returns set `is_diblokir = TRUE` and calculate `total_denda` at Rp 1.000/day overdue
-- [ ] **RET-03**: A late return triggers an overdue-notification via the notification service (Brevo call stubbed/logged in v1)
-- [ ] **RET-04**: Pustakawan can mark a fine as paid ("Denda Lunas"), clearing `is_diblokir`
+- [x] **RET-01**: Pustakawan can process a return (â†' `dikembalikan`), comparing `tanggal_kembali` to `tanggal_tenggat`
+- [x] **RET-02**: Late returns set `is_diblokir = TRUE` and calculate `total_denda` at Rp 1.000/day overdue
+- [x] **RET-03**: A late return triggers an overdue-notification via the notification service (Brevo call stubbed/logged in v1)
+- [x] **RET-04**: Pustakawan can mark a fine as paid ("Denda Lunas"), clearing `is_diblokir`
 
 ### Dashboard & Members
 
-- [ ] **DASH-01**: Pustakawan dashboard shows pending approval requests, overdue loans, and basic stats
-- [ ] **DASH-02**: Pustakawan can view the list of mahasiswa members, including blocked status and outstanding fines
-- [ ] **DASH-03**: Mahasiswa can view their own loan history and current due dates
+- [x] **DASH-01**: Pustakawan dashboard shows pending approval requests, overdue loans, and basic stats
+- [x] **DASH-02**: Pustakawan can view the list of mahasiswa members, including blocked status and outstanding fines
+- [x] **DASH-03**: Mahasiswa can view their own loan history and current due dates
 
 ### Deployment
 
@@ -84,23 +84,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CAT-02 | Phase 2 | ✅ Complete |
 | CAT-03 | Phase 2 | ✅ Complete |
 | CAT-04 | Phase 2 | ✅ Complete |
-| LOAN-01 | Phase 3 | Pending |
-| LOAN-02 | Phase 3 | Pending |
-| LOAN-03 | Phase 3 | Pending |
-| LOAN-04 | Phase 3 | Pending |
-| LOAN-05 | Phase 3 | Pending |
-| LOAN-06 | Phase 3 | Pending |
-| RET-01 | Phase 4 | Pending |
---- RET-01 covered by PUT /peminjaman/{id}/kembalikan endpoint — records tanggal_kembali and status_peminjaman=dikembalikan
-| RET-02 | Phase 4 | Pending |
---- RET-02 fine calculation (Rp 1.000/day) + is_diblokir=TRUE on late return
-| RET-03 | Phase 4 | Pending |
---- RET-03 BREVO_NOTIFICATION stub logged via logger.info — visible in docker-compose logs backend
-| RET-04 | Phase 4 | Pending |
---- RET-04 Denda Lunas via PUT /peminjaman/anggota/{id}/lunasi_denda — clears is_diblokir
-| DASH-01 | Phase 5 | Pending |
-| DASH-02 | Phase 5 | Pending |
-| DASH-03 | Phase 5 | Pending |
+| LOAN-01 | Phase 3 | ✅ Complete |
+| LOAN-02 | Phase 3 | ✅ Complete |
+| LOAN-03 | Phase 3 | ✅ Complete |
+| LOAN-04 | Phase 3 | ✅ Complete |
+| LOAN-05 | Phase 3 | ✅ Complete |
+| LOAN-06 | Phase 3 | ✅ Complete |
+| RET-01 | Phase 4 | ✅ Complete |
+| RET-02 | Phase 4 | ✅ Complete |
+| RET-03 | Phase 4 | ✅ Complete |
+| RET-04 | Phase 4 | ✅ Complete |
+| DASH-01 | Phase 5 | ✅ Complete |
+| DASH-02 | Phase 5 | ✅ Complete |
+| DASH-03 | Phase 5 | ✅ Complete |
 | DEPLOY-01 | Phase 1 | ✅ Complete |
 | NFR-01 | Phase 1 | ✅ Complete |
 | NFR-02 | Phase 1 | ✅ Complete |
@@ -108,3 +104,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Coverage:**
 - v1 requirements: 24 total
 - Mapped to phases: 24
+- All v1 requirements: ✅ Complete

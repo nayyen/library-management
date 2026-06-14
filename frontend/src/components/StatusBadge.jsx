@@ -37,6 +37,16 @@ const variants = {
     class: 'bg-surface-container text-on-surface-variant border-outline-variant',
     icon: 'close',
   },
+  anggota_aktif: {
+    label: 'Aktif',
+    class: 'bg-sage-green/20 text-sage-green border-sage-green/30',
+    icon: null,
+  },
+  anggota_diblokir: {
+    label: 'Diblokir',
+    class: 'bg-alert-crimson text-on-error border-transparent',
+    icon: null,
+  },
 };
 
 export default function StatusBadge({ status, compact = false }) {
@@ -52,13 +62,15 @@ export default function StatusBadge({ status, compact = false }) {
         compact ? 'px-2 py-0.5 text-[11px]' : 'px-3 py-1 text-label-sm'
       }`}
     >
-      <span
-        className="material-symbols-outlined"
-        style={{ fontSize: compact ? 14 : 16 }}
-        aria-hidden="true"
-      >
-        {v.icon}
-      </span>
+      {v.icon && (
+        <span
+          className="material-symbols-outlined"
+          style={{ fontSize: compact ? 14 : 16 }}
+          aria-hidden="true"
+        >
+          {v.icon}
+        </span>
+      )}
       {v.label}
     </span>
   );

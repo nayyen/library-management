@@ -58,6 +58,9 @@ function TanggalCell({ item }) {
   if (status === 'dipinjam') {
     return <>Tenggat {formatDate(item.tanggal_tenggat)}</>;
   }
+  if (status === 'dikembalikan') {
+    return <>Dikembalikan {formatDate(item.tanggal_kembali)}</>;
+  }
   // ditolak / dibatalkan
   return <>{formatDateTime(item.tanggal_pengajuan)}</>;
 }
@@ -246,30 +249,6 @@ export default function PinjamanPage() {
     });
   }
 
-  async function handleLunasiDenda(item) {
-    showConfirm({
-      title: 'Tandai Denda Lunas?',
-      message: `Denda sebesar Rp ${item.total_denda.toLocaleString('id-ID')} milik ${item.nama} akan dinyatakan lunas dan akun akan dibuka kembali.`,
-      confirmLabel: 'Denda Lunas',
-      destructive: false,
-      onConfirm: async () => {
-        setConfirmLoading(true);
-        try {
-          await api.put(`/peminjaman/anggota/${item.id_pengguna}/lunasi_denda`);
-          setConfirm(null);
-          setToast({
-            type: 'success',
-            message: `Denda dinyatakan lunas. Akun ${item.nama} tidak lagi diblokir.`,
-          });
-          setRefreshKey((k) => k + 1);
-        } catch {
-          setConfirm(null);
-          setToast({ type: 'error', message: 'Gagal memproses tindakan. Silakan coba lagi.' });
-        }
-      },
-    });
-  }
-
   /* ── Book cell (reused in both tables) ── */
   function BookCell({ item }) {
     return (
@@ -356,7 +335,6 @@ export default function PinjamanPage() {
   const menunggu = loanData?.menunggu_persetujuan ?? [];
   const siapDiambil = loanData?.siap_diambil ?? [];
   const sedangDipinjam = loanData?.sedang_dipinjam ?? [];
-  const anggotaDiblokir = loanData?.anggota_diblokir ?? [];
 
   return (
     <main className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8 md:py-12 space-y-8">
@@ -739,71 +717,13 @@ export default function PinjamanPage() {
               </div>
             )}
           </section>
-
-          {/* Section 4: Anggota Diblokir */}
-          <section className="bg-surface-container-lowest border border-paper-shadow rounded-xl overflow-hidden">
-            <div className="p-6 border-b border-paper-shadow bg-surface-container-low">
-              <h2 className="text-headline-sm font-headline-sm text-primary">
-                Anggota Diblokir
-              </h2>
-              <p className="text-body-sm font-body-sm text-outline mt-1">
-                Anggota dengan denda tertunggak — buka blokir setelah denda dibayar.
-              </p>
-            </div>
-
-            {anggotaDiblokir.length === 0 ? (
-              <EmptyState
-                icon="task_alt"
-                title="Tidak Ada Anggota Diblokir"
-                message="Semua anggota dalam status baik — tidak ada denda tertunggak."
-              />
-            ) : (
-              <div className="p-6 space-y-4">
-                {anggotaDiblokir.map((item) => (
-                  <div
-                    key={item.id_pengguna}
-                    className="flex items-center justify-between p-4 rounded-xl bg-surface-container-low border border-paper-shadow"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-alert-crimson/20 text-alert-crimson flex items-center justify-center font-bold text-sm shrink-0">
-                        {item.nama?.charAt(0)?.toUpperCase() ?? '?'}
-                      </div>
-                      <div>
-                        <p className="text-body-md font-body-md text-primary">
-                          {item.nama}
-                        </p>
-                        <p className="text-body-sm font-body-sm text-outline">
-                          {item.email}
-                        </p>
-                        <p className="text-body-sm font-body-sm text-outline mt-1">
-                          Denda Tertunggak:{' '}
-                          <span className="text-alert-crimson font-semibold">
-                            Rp {item.total_denda.toLocaleString('id-ID')}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleLunasiDenda(item)}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-label-sm font-label-sm text-white bg-sage-green hover:opacity-90 transition-opacity min-h-[44px] shrink-0"
-                      aria-label={`Tandai denda ${item.nama} lunas`}
-                    >
-                      <span className="material-symbols-outlined text-[18px]">lock_open</span>
-                      Denda Lunas
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
         </div>
       )}
 
       {/* ── PUSTAKAWAN loading (skeleton) ── */}
       {!isMahasiswa && loading && (
         <div className="space-y-8">
-          {[1, 2, 3, 4].map((sec) => (
+          {[1, 2, 3].map((sec) => (
             <section
               key={sec}
               className="bg-surface-container-lowest border border-paper-shadow rounded-xl overflow-hidden"
